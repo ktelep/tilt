@@ -1,0 +1,29 @@
+<html>
+<center>
+<br><br>
+<table width=50%>
+<tr>
+<th width=33%>TiltLR</th><th width=33%>TiltFB</th><th width=33%>Direction</th>
+</tr>
+<tr><td id="LR"></td><td id="FB"></td><td id="Dir"></td>
+</tr>
+</table>
+<div id="data">
+</div>
+</html>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script type="text/javascript">
+    function loaddata(){
+         $.get("/latest").done(function (data) {
+              var a = data.split(":");
+              document.getElementById("LR").innerHTML = a[0];
+              document.getElementById("LR").innerHTML = a[1];
+              document.getElementById("Dir").innerHTML = a[2];
+         }); 
+    }
+ 
+    loaddata();
+    setInterval(function(){
+        loaddata();
+    }, 100);
+</script> 

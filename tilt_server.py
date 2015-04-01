@@ -37,7 +37,7 @@ def dump_data():
     return "<br>".join(map(str,r.lrange('data_list',-50,-1)))
 
 @app.route('/latest')
-def dump_data():
+def latest():
     return str(r.pop('data_list'))
 
 if __name__ == '__main__':

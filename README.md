@@ -4,12 +4,15 @@
 
 ## Requirements
 
-CloudFoundry
-Redis
+* CloudFoundry
+* Redis
 
 ## Instructions
 
-Simply perform a "cf push tilt", then bind a redis server instance to the application.
+From the root of the repo
+    cf push tilt
+
+Then bind a redis server to the instance via cloudfoundry.  You may need to restage after you bind the redis instance
 
 Accessing the app via it's URL will present you with an HTML5
 

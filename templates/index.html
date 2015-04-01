@@ -1,70 +1,63 @@
-
 <!doctype html>
-<html lang="en"> 
-<head>
-  <meta charset="UTF-8">
-  <title></title>
-  
-  <style type="text/css">
-    body {
-      font-family: sans-serif;
-    }
-  
-      .main {
-      border: 1px solid black;
-      box-shadow: 10px 10px 5px #888;
-      border-radius: 12px;
-      padding: 20px;
-      background-color: #ddd;
-      margin: 25px;
-      width: 450px;
-      margin-left:auto;
-      margin-right:auto;  
-    }
-    
-    .logo {
-      width:275px;
-      margin-left: auto;
-      margin-right: auto;
-      display: block;
-      padding: 15px;
-    }
-    
-    .container {
-      -webkit-perspective: 300; perspective: 300;
-    }
-  </style>
+<html lang="en">
+  <head>
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1"><meta charset="UTF-8">
+      <link href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+      <link href="{{ url_for('static', filename='bootstrap/css/bootstrap-theme.min.css') }}" rel="stylesheet">
+      <style>  
+         .container {
+            -webkit-perspective: 300; perspective: 300;
+         }
 
-</head>
-<body>
-  <div class="main">
-      <h2>Device Orientation</h2>
-      <table>
-        <tr>
-          <td>Event Supported</td>
-          <td id="doEvent"></td>
-        </tr>
-        <tr>
-          <td>Device Type</td>
-          <td id="doDevType"></td>
-        </tr>
-        <tr>
-          <td>Tilt Left/Right [gamma]</td>
-          <td id="doTiltLR"></td>
-        </tr>
-        <tr>
-          <td>Tilt Front/Back [beta]</td>
-          <td id="doTiltFB"></td>
-        </tr>
-        <tr>
-          <td>Direction [alpha]</td>
-          <td id="doDirection"></td>
-        </tr>
-      </table>
+         .logo {
+             width:275px;
+             margin-left: auto;
+             margin-right: auto;
+             display: block;
+             padding: 15px;
+         }
+
+      </style>
+
+  </head>
+<body role="document">
+  <div class="top">
+      <section class="panel panel-default">
+          <header class="panel-heading">
+             <h3 id=devid class="panel-title">Device Orientation</h3>
+          </header>
+          <div class="panel-body">
+              <form class="form-horizontal">
+              <div class="form-group">
+                  <label for="TiltLR" class="control-label col-xs-6">Left/Right Tilt</label>
+                  <div class="col-xs-6">
+                  <input class="form-control" type="text" name="TiltLR" id="TiltLR" />
+                  </div>
+              </div>
+              <div class="form-group">
+                  <label for="TiltFB" class="control-label col-xs-6">Front/Back Tilt</label>
+                  <div class="col-xs-6">
+                  <input class="form-control" type="text" name="TiltFB" id="TiltFB" />
+                  </div>
+              </div>
+              <div class="form-group">
+                  <label for="Direction" class="control-label col-xs-6">Direction</label>
+                  <div class="col-xs-6">
+                  <input class="form-control" type="text" name="Direction" id="Direction" />
+                  </div>
+              </div>
+         </div>
+      </section>
   </div>
-  
+
   <div class="container" style="-webkit-perspective: 300; perspective: 300;">
     <img src="{{ url_for('static', filename='EMC-Logo.png') }}" id="imgLogo" class="logo">
+  </div>
+
+  <div class="bottom">
+     <input id="device_id" type=text>
   </div>
 
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
@@ -72,12 +65,23 @@
     init();
     url = "/send"
     var count = 0;
-    
+   
+    function guid() {
+      function s4() {
+         return Math.floor((1 + Math.random()) * 0x10000)
+       .toString(16)
+       .substring(1);
+      }
+      return s4() + '-' + s4()
+    }
+
+
     function init() {
 
+      var dev_id = guid()
+      document.getElementById("devid").innerHTML = "Device ID: "+ dev_id
+
       if (window.DeviceOrientationEvent) {
-        document.getElementById("doEvent").innerHTML = "DeviceOrientation";
-        document.getElementById("doDevType").innerHTML = navigator.userAgent
         // Listen for the deviceorientation event and handle the raw data
         window.addEventListener('deviceorientation', function(eventData) {
           // gamma is the left-to-right tilt in degrees, where right is positive
@@ -90,19 +94,19 @@
           var dir = eventData.alpha
           
           // call our orientation event handler
-          deviceOrientationHandler(tiltLR, tiltFB, dir);
+          deviceOrientationHandler(tiltLR, tiltFB, dir, dev_id);
           }, false);
       } else {
         document.getElementById("doEvent").innerHTML = "Not supported on your device or browser.  Sorry."
       }
     }
   
-    function deviceOrientationHandler(tiltLR, tiltFB, dir) {
-      document.getElementById("doTiltLR").innerHTML = Math.round(tiltLR);
-      document.getElementById("doTiltFB").innerHTML = Math.round(tiltFB);
-      document.getElementById("doDirection").innerHTML = Math.round(dir);
+    function deviceOrientationHandler(tiltLR, tiltFB, dir, dev_id) {
+      document.getElementById("TiltLR").value = Math.round(tiltLR);
+      document.getElementById("TiltFB").value = Math.round(tiltFB);
+      document.getElementById("Direction").value = Math.round(dir);
      
-      var position = {TiltLR: tiltLR, TiltFB: tiltFB, Direction: dir};
+      var position = {UUID: dev_id, TiltLR: tiltLR, TiltFB: tiltFB, Direction: dir};
 
       // Apply the transform to the image
       var logo = document.getElementById("imgLogo");

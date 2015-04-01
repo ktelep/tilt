@@ -10,6 +10,7 @@
 ## Instructions
 
 From the root of the repo
+
     cf push tilt
 
 Then bind a redis server to the instance via cloudfoundry.  You may need to restage after you bind the redis instance

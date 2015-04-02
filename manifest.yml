@@ -3,6 +3,6 @@
 # Kurt Telep
 applications:
 - name: tiltdemo
-  memory: 128MB
+  memory: 256MB
   services:
   - TILT_REDIS

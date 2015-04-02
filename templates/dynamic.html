@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1"><meta charset="UTF-8">
+      <link href="file:///Users/telepk/src/tilt/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+      <link href="file:///Users/telepk/src/tilt/static/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
+  </head>
+  <body>
+  <div class="container">
+  <div class="page-header">
+     <h1>Tilt Data Output Demo</h1>
+  </div>
+  <div class="row">
+     <div id="b1" class="col-md-4 outputpanel"></div>
+     <div id="b2" class="col-md-4 outputpanel"></div>
+     <div id="b3" class="col-md-4 outputpanel"></div>
+  </div>
+  <div class="row">
+     <div id="b4" class="col-md-4 outputpanel"></div>
+     <div id="b5" class="col-md-4 outputpanel"></div>
+     <div id="b6" class="col-md-4 outputpanel"></div>
+  </div>
+  <div class="row">
+     <div id="b7" class="col-md-4 outputpanel"></div>
+     <div id="b8" class="col-md-4 outputpanel"></div>
+     <div id="b9" class="col-md-4 outputpanel"></div>
+  </div>
+  </div>
+  </body>
+
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+  <script type="text/javascript">
+
+
+    function create_panel(dev_id){
+        // Grab a list of output panel divs
+        var elements = $('.outputpanel');
+        var new_pane = 0;
+    
+        var panel_template =  '<div class="panel panel-default">' +
+                              '<div class="panel-heading">Device ID: ' + dev_id +'</div>' +
+                              '<div class="panel-body">' +
+                              'Anim pariatur cliche reprehenderit,' +
+                              'enim eiusmod high life accusamus terry richardson ad squid.' +
+                              '3 wolf moon officia aute,' +
+                              '</div>' +
+                              '</div>'
+
+        // Locate the one with no childNodes (empty)
+        for(var i=0; i<elements.length; i++) {
+            if (elements[i].childNodes.length === 0) {
+                new_pane = i;
+                break
+            }
+        }
+
+        // Create the panel in the identified pane
+        elements[new_pane].innerHTML = panel_template;
+        elements[new_pane].className = elements[new_pane].className + " " + dev_id;
+        return;
+    }
+
+    function destroy_panel(dev_id){
+        // Super easy with jQuery
+        var element = $('.'+dev_id);
+        element.empty();
+        element.removeClass(dev_id);
+       
+        var elements = $('.outputpanel');
+        // Now we have to shuffle them all down 
+        for(var i=0; i<elements.length-1; i++) {
+           if (elements[i].childNodes.length === 0) {
+              console.log(i)
+              console.log(elements[i])
+              console.log(elements[i+1])
+              // Copy the next element, and clear it
+              elements[i].innerHTML = elements[i+1].innerHTML;
+              elements[i].className = elements[i+1].className;
+              elements[i+1].innerHTML = ""
+           }
+        }
+    }
+
+    function load_data() {
+        $.get('/dump').done( function(data) {
+            console.log(data)
+            // Grab the list of 
+            // DO something with the data
+        });
+    } 
+    //loaddata();
+    //setInterval(function(){
+    //    loaddata();
+    //}, 500);
+
+</script> 
+
+</html>

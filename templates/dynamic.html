@@ -35,13 +35,15 @@
 
     var panels = []
 
-    function create_panel(dev_id){
+    function create_panel(dev_id,os){
         // Grab a list of output panel divs
         var elements = $('.outputpanel');
         var new_pane = 0;
     
         var panel_template =  '<div class="panel panel-default">' +
-                              '<div class="panel-heading">Device ID: ' + dev_id +'</div>' +
+                              '<div class="panel-heading clearfix">' +
+                              '<h4 class="panel-title pull-left"> Device ID: ' + dev_id +'</h4>' +
+                              '<div class="panel-title pull-right">' + os + '</div></div>' +
                               '<div class="panel-body">' +
                               '<p>Left/Right Tilt: <span id="' + dev_id +'_TiltLR"></span></p>' +
                               '<p>Front/Back Tilt: <span id="' + dev_id +'_TiltFB"></span></p>' +
@@ -98,7 +100,7 @@
                if ($.inArray(data[0],dev_ids_found) == -1) {
                    dev_ids_found.push(data[0]);
                    if ($.inArray(data[0],panels) == -1) {
-                      create_panel(data[0]);
+                      create_panel(data[0],data[4]);
                    } 
                    $("#"+data[0]+"_TiltLR").text(data[1]);
                    $("#"+data[0]+"_TiltFB").text(data[2]);

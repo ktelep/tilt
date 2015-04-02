@@ -62,23 +62,31 @@
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
   <script type="text/javascript">
     init();
-    url = "/send"
-    var count = 0;
-   
+    var url = "/send";
+
     function guid() {
       function s4() {
          return Math.floor((1 + Math.random()) * 0x10000)
        .toString(16)
-       .substring(1);
+       .substring(1)
       }
       return s4() + '-' + s4()
     }
 
-
     function init() {
-
+ 
       var dev_id = guid()
       document.getElementById("devid").innerHTML = "Device ID: "+ dev_id
+
+      var os = "";
+      var ua = navigator.userAgent;
+      if ((ua.match(/iPad/i)) || (ua.match(/iPhone/i)) || (ua.match(/iPod/i))) {
+          os = "iOS";
+      } else if (ua.match(/Android/i)) {
+          os = "Android";
+      } else {
+          os = "Unknown";
+      }
 
       if (window.DeviceOrientationEvent) {
         // Listen for the deviceorientation event and handle the raw data
@@ -93,19 +101,19 @@
           var dir = eventData.alpha
           
           // call our orientation event handler
-          deviceOrientationHandler(tiltLR, tiltFB, dir, dev_id);
+          deviceOrientationHandler(tiltLR, tiltFB, dir, dev_id, os);
           }, false);
       } else {
         document.getElementById("doEvent").innerHTML = "Not supported on your device or browser.  Sorry."
       }
     }
   
-    function deviceOrientationHandler(tiltLR, tiltFB, dir, dev_id) {
+    function deviceOrientationHandler(tiltLR, tiltFB, dir, dev_id, os) {
       document.getElementById("TiltLR").value = Math.round(tiltLR);
       document.getElementById("TiltFB").value = Math.round(tiltFB);
       document.getElementById("Direction").value = Math.round(dir);
      
-      var position = {UUID: dev_id, TiltLR: tiltLR, TiltFB: tiltFB, Direction: dir};
+      var position = {UUID: dev_id, TiltLR: tiltLR, TiltFB: tiltFB, Direction: dir, OS: os};
 
       // Apply the transform to the image
       var logo = document.getElementById("imgLogo");

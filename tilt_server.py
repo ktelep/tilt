@@ -21,11 +21,12 @@ def index_page():
 @app.route('/send', methods=['POST'])
 def receive_post_data():
     if request.method == 'POST':
-        data_line = ":".join([request.form['UUID'], request.form['TiltLR']
-                              request.form['TiltFB'], request.form['Direction']
+        data_line = ":".join([request.form['UUID'], request.form['TiltLR'],
+                              request.form['TiltFB'], request.form['Direction'],
+                              request.form['OS']
                               ])
-        r.rpush('data_list', data_line)
-        r.rtrim('data_list', 0, 99)
+        r.lpush('data_list', data_line)
+        r.ltrim('data_list', 0, 99)
         return "success"
     return "fail"
 

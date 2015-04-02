@@ -33,6 +33,7 @@
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
   <script type="text/javascript">
 
+    var panels = []
 
     function create_panel(dev_id){
         // Grab a list of output panel divs
@@ -42,9 +43,9 @@
         var panel_template =  '<div class="panel panel-default">' +
                               '<div class="panel-heading">Device ID: ' + dev_id +'</div>' +
                               '<div class="panel-body">' +
-                              'Anim pariatur cliche reprehenderit,' +
-                              'enim eiusmod high life accusamus terry richardson ad squid.' +
-                              '3 wolf moon officia aute,' +
+                              '<p>Left/Right Tilt: <span id="' + dev_id +'_TiltLR"></span></p>' +
+                              '<p>Front/Back Tilt: <span id="' + dev_id +'_TiltFB"></span></p>' +
+                              '<p>Direction: <span id="' + dev_id +'_Direction"></span></p>' +
                               '</div>' +
                               '</div>'
 
@@ -59,6 +60,7 @@
         // Create the panel in the identified pane
         elements[new_pane].innerHTML = panel_template;
         elements[new_pane].className = elements[new_pane].className + " " + dev_id;
+        panels.push(dev_id);
         return;
     }
 
@@ -67,14 +69,14 @@
         var element = $('.'+dev_id);
         element.empty();
         element.removeClass(dev_id);
-       
-        var elements = $('.outputpanel');
+
+        // Remove from our list of panels
+        panels.splice($.inArray(dev_id,panels), 1);
+
         // Now we have to shuffle them all down 
+        var elements = $('.outputpanel');
         for(var i=0; i<elements.length-1; i++) {
            if (elements[i].childNodes.length === 0) {
-              console.log(i)
-              console.log(elements[i])
-              console.log(elements[i+1])
               // Copy the next element, and clear it
               elements[i].innerHTML = elements[i+1].innerHTML;
               elements[i].className = elements[i+1].className;
@@ -85,15 +87,38 @@
 
     function load_data() {
         $.get('/dump').done( function(data) {
-            console.log(data)
-            // Grab the list of 
-            // DO something with the data
+           console.log(data);
+           if (data.length > 1) {
+               // Split the entries into an array
+               // We want to display just the latest entry from each device id we know
+               entries = data.split(',');
+               dev_ids_found = [];
+               for (var i=0; i<entries.length; i++) {
+               data = entries[i].split(":");
+               if ($.inArray(data[0],dev_ids_found) == -1) {
+                   dev_ids_found.push(data[0]);
+                   if ($.inArray(data[0],panels) == -1) {
+                      create_panel(data[0]);
+                   } 
+                   $("#"+data[0]+"_TiltLR").text(data[1]);
+                   $("#"+data[0]+"_TiltFB").text(data[2]);
+                   $("#"+data[0]+"_Direction").text(data[3]);
+               }
+
+           } 
+           // Cross check our panels list and remove any that do not exist anymore
+           for (var i=0; i<panels.length; i++) {
+               if ($.inArray(panels[i], dev_ids_found) == -1) {
+                   destroy_panel(panels[i])
+               }
+           }
+           }
         });
     } 
-    //loaddata();
-    //setInterval(function(){
-    //    loaddata();
-    //}, 500);
+    load_data();
+    setInterval(function(){
+        load_data();
+    }, 250);
 
 </script> 
 

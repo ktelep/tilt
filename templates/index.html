@@ -88,6 +88,7 @@
           os = "Unknown";
       }
 
+      update_count = 0;
       if (window.DeviceOrientationEvent) {
         // Listen for the deviceorientation event and handle the raw data
         window.addEventListener('deviceorientation', function(eventData) {
@@ -121,12 +122,16 @@
       logo.style.MozTransform = "rotate("+ tiltLR +"deg)";
       logo.style.transform = "rotate("+ tiltLR +"deg) rotate3d(1,0,0, "+ (tiltFB*-1)+"deg)";
 
-      // Send our data to the server
-      $.ajax({
-          type: "POST",
-          url: url,
-          data: position,
-      }); 
+      update_count++;
+      if (update_count == 5) {
+          // Send our data to the server 
+          $.ajax({
+              type: "POST",
+              url: url,
+              data: position,
+              }); 
+          update_count = 0;
+      }
     }
     
     

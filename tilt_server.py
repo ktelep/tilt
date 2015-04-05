@@ -1,10 +1,12 @@
 from flask import Flask, request, render_template
+from flask.ext.socketio import SocketIO
 import os
 import json
 import redis
 
 app = Flask(__name__, static_url_path='/static')
 port = os.getenv('VCAP_APP_PORT', '5000')
+socketio = SocketIO(app)
 
 rediscloud_service = json.loads(os.environ['VCAP_SERVICES'])['rediscloud'][0]
 credentials = rediscloud_service['credentials']
@@ -12,13 +14,17 @@ r = redis.Redis(host=credentials['hostname'],
                 port=credentials['port'],
                 password=credentials['password'])
 
+r = dict()
 
 @app.route('/')
 def index_page():
     return render_template('index.html')
 
+@socketio.on('data_in')
+def handle_incoming_data(data):
+    print data
+    return dd
 
-@app.route('/send', methods=['POST'])
 def receive_post_data():
     if request.method == 'POST':
         data_line = ":".join([request.form['UUID'], request.form['TiltLR'],

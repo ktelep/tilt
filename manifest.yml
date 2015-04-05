@@ -2,7 +2,7 @@
 # Manifest for tilt demo application
 # Kurt Telep
 applications:
-- name: tilt
+- name: tilt_socket
   scale: 1
   memory: 256MB
   services:

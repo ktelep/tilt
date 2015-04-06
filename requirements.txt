@@ -1,3 +1,8 @@
 Flask==0.10.1
-redis
-gunicorn
+gunicorn==18.0
+itsdangerous==0.24
+Jinja2==2.7.3
+MarkupSafe==0.23
+mccabe==0.3
+redis==2.10.3
+Werkzeug==0.10.4

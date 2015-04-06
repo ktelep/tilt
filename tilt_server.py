@@ -8,9 +8,12 @@ port = os.getenv('VCAP_APP_PORT', '5000')
 
 rediscloud_service = json.loads(os.environ['VCAP_SERVICES'])['rediscloud'][0]
 credentials = rediscloud_service['credentials']
-r = redis.Redis(host=credentials['hostname'],
-                port=credentials['port'],
-                password=credentials['password'])
+pool = redis.ConnectionPool(host=credentials['hostname'],
+                            port=credentials['port'],
+                            password=credentials['password'],
+                            max_connections=2)
+
+r = redis.Redis(connection_pool=pool)
 
 
 @app.route('/')
@@ -21,8 +24,10 @@ def index_page():
 @app.route('/send', methods=['POST'])
 def receive_post_data():
     if request.method == 'POST':
-        data_line = ":".join([request.form['UUID'], request.form['TiltLR'],
-                              request.form['TiltFB'], request.form['Direction'],
+        data_line = ":".join([request.form['UUID'],
+                              request.form['TiltLR'],
+                              request.form['TiltFB'],
+                              request.form['Direction'],
                               request.form['OS']
                               ])
         r.lpush('data_list', data_line)

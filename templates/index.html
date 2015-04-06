@@ -89,6 +89,8 @@
           os = "Unknown";
       }
       socket = io.connect('/', {port:4443, secure:true});
+      // For local debugging
+      // socket = io.connect('/', {port:5000, secure:false});
 
       update_count = 0;
       if (window.DeviceOrientationEvent) {

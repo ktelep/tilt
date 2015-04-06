@@ -7,14 +7,22 @@ import redis
 app = Flask(__name__, static_url_path='/static')
 port = os.getenv('VCAP_APP_PORT', '5000')
 socketio = SocketIO(app)
+pool = None
 
-rediscloud_service = json.loads(os.environ['VCAP_SERVICES'])['rediscloud'][0]
-credentials = rediscloud_service['credentials']
-r = redis.Redis(host=credentials['hostname'],
-                port=credentials['port'],
-                password=credentials['password'])
+if not os.getenv('VCAP_SERVICES'):
+    # If we're running locally, use the local redis instance
+    pool = redis.ConnectionPool(host='localhost',port=6379,db=0)
+else:
+    # Otherwise, we use the params passed in the CF environment
+    rediscloud_service = json.loads(os.environ['VCAP_SERVICES'])['rediscloud'][0]
+    credentials = rediscloud_service['credentials']
+    pool = redis.ConnectionPool(host=credentials['hostname'], 
+                            port=credentials['port'],
+                            password=credentials['password'],
+                            max_connections=2)
 
-r = dict()
+
+r = redis.Redis(connection_pool=pool)
 
 @app.route('/')
 def index_page():
@@ -22,8 +30,14 @@ def index_page():
 
 @socketio.on('data_in')
 def handle_incoming_data(data):
-    print data
-    return dd
+    data_line = ":".join([data['UUID'], str(data['TiltLR']), 
+                          str(data['TiltFB']), str(data['Direction']),
+                          data['OS']
+                          ])
+    print data_line
+    r.lpush('data_list', data_line)
+    r.ltrim('data_list', 0, 99)
+    return "success"
 
 def receive_post_data():
     if request.method == 'POST':
@@ -44,8 +58,10 @@ def show():
 
 @app.route('/dump')
 def dump_data():
-    return ",".join(map(str, r.lrange('data_list', -50, -1)))
+    data_range = r.lrange('data_list', -50, -1)
+    if data_range:
+        return ",".join(map(str, data_range))
+    return
 
 if __name__ == '__main__':
-    print "Port" + port
     app.run(host='0.0.0.0', port=int(port))

@@ -33,8 +33,9 @@
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
   <script type="text/javascript">
 
-    var panels = []
-
+    var panels = [];
+    zero_counter = 0;
+    
     function create_panel(dev_id,os){
         // Grab a list of output panel divs
         var elements = $('.outputpanel');
@@ -89,38 +90,50 @@
 
     function load_data() {
         $.get('/dump').done( function(data) {
-           console.log(data);
+           console.log(data.length);
+           dev_ids_found = [];
            if (data.length > 1) {
+               zero_counter = 0;
                // Split the entries into an array
                // We want to display just the latest entry from each device id we know
                entries = data.split(',');
                dev_ids_found = [];
                for (var i=0; i<entries.length; i++) {
-               data = entries[i].split(":");
-               if ($.inArray(data[0],dev_ids_found) == -1) {
-                   dev_ids_found.push(data[0]);
-                   if ($.inArray(data[0],panels) == -1) {
-                      create_panel(data[0],data[4]);
-                   } 
-                   $("#"+data[0]+"_TiltLR").text(data[1]);
-                   $("#"+data[0]+"_TiltFB").text(data[2]);
-                   $("#"+data[0]+"_Direction").text(data[3]);
+                   data = entries[i].split(":");
+                   if ($.inArray(data[0],dev_ids_found) == -1) {
+                       dev_ids_found.push(data[0]);
+                       if ($.inArray(data[0],panels) == -1) {
+                           create_panel(data[0],data[4]);
+                       } 
+                       $("#"+data[0]+"_TiltLR").text(data[1]);
+                       $("#"+data[0]+"_TiltFB").text(data[2]);
+                       $("#"+data[0]+"_Direction").text(data[3]);
+                   }
+               } 
+           
+               // Cross check our panels list and remove any that do not exist anymore
+               for (var i=0; i<panels.length; i++) {
+                   if ($.inArray(panels[i], dev_ids_found) == -1) {
+                       destroy_panel(panels[i])
+                   }
                }
-
-           } 
-           // Cross check our panels list and remove any that do not exist anymore
-           for (var i=0; i<panels.length; i++) {
-               if ($.inArray(panels[i], dev_ids_found) == -1) {
-                   destroy_panel(panels[i])
+           } else {
+               zero_counter++;
+               if (zero_counter > 5) {
+                   for (var i=0; i<panels.length; i++) {
+                       if ($.inArray(panels[i], dev_ids_found) == -1) {
+                           destroy_panel(panels[i])
+                       }
+                   }
+                   zero_counter=0;
                }
-           }
-           }
+            }
         });
     } 
     load_data();
     setInterval(function(){
         load_data();
-    }, 250);
+    }, 500);
 
 </script> 
 

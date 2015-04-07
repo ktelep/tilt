@@ -1,4 +1,5 @@
 from flask import Flask, request, render_template
+import time
 import os
 import json
 import redis
@@ -16,6 +17,13 @@ pool = redis.ConnectionPool(host=credentials['hostname'],
 r = redis.Redis(connection_pool=pool)
 
 
+def timestamp():
+    now = time.time()
+    localtime = time.localtime(now)
+    milliseconds = '%03d' % int((now - int(now)) * 1000)
+    return int(time.strftime('%Y%m%d%H%M%S', localtime) + milliseconds)
+
+
 @app.route('/')
 def index_page():
     return render_template('index.html')
@@ -30,8 +38,9 @@ def receive_post_data():
                               request.form['Direction'],
                               request.form['OS']
                               ])
-        r.lpush('data_list', data_line)
-        r.ltrim('data_list', 0, 99)
+        # Key is uuid:<UUID>, expires in 3 seconds
+        r.zadd('uuid:' + request.form['UUID'], data_line, timestamp())
+        r.expire('uuid:' + request.form['UUID'], 3)
         return "success"
     return "fail"
 
@@ -42,9 +51,16 @@ def show():
 
 
 @app.route('/dump')
-def dump_data():
-    return ",".join(map(str, r.lrange('data_list', -50, -1)))
+def spring_dump():
+    valid_keys = r.keys('uuid:*')
+    data = list()
+    max_score = timestamp()
+    for key in valid_keys:
+        data.extend(r.zrange(key, 0, max_score))
+        r.zremrangebyscore(key, 0, max_score)
+    return ",".join(map(str, data))
 
 if __name__ == '__main__':
+    app.debug = True
     print "Port" + port
     app.run(host='0.0.0.0', port=int(port))

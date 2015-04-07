@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, jsonify
 import time
 import os
 import json
@@ -59,6 +59,17 @@ def spring_dump():
         data.extend(r.zrange(key, 0, max_score))
         r.zremrangebyscore(key, 0, max_score)
     return ",".join(map(str, data))
+
+
+@app.route('/safe_dump', methods=['GET', 'POST'])
+def safe_dump():
+    min_score = int(request.args.get('min_score', 0))
+    valid_keys = r.keys('uuid:*')
+    data = list()
+    max_score = timestamp()
+    for key in valid_keys:
+        data.extend(r.zrangebyscore(key, min_score, max_score))
+    return jsonify(timestamp=max_score, data=data, min_score=min_score)
 
 if __name__ == '__main__':
     app.debug = True

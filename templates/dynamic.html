@@ -28,14 +28,18 @@
      <div id="b9" class="col-md-4 outputpanel"></div>
   </div>
   </div>
-  </body>
 
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
   <script type="text/javascript">
 
     var panels = [];
     zero_counter = 0;
-    
+    min_ts = 0; 
+
+    $(document).ready(function() {
+        $.ajaxSetup({ cache: false });
+        });
+
     function create_panel(dev_id,os){
         // Grab a list of output panel divs
         var elements = $('.outputpanel');
@@ -89,25 +93,26 @@
     }
 
     function load_data() {
-        $.get('/dump').done( function(data) {
-           console.log(data.length);
+       $.getJSON('/safe_dump', { min_score: min_ts}, function(pos_data) {
+           console.log(pos_data.timestamp);
+           min_ts = pos_data.timestamp; 
            dev_ids_found = [];
-           if (data.length > 1) {
+           entries = pos_data.data
+           if (entries.length > 1) {
                zero_counter = 0;
                // Split the entries into an array
                // We want to display just the latest entry from each device id we know
-               entries = data.split(',');
                dev_ids_found = [];
                for (var i=0; i<entries.length; i++) {
-                   data = entries[i].split(":");
-                   if ($.inArray(data[0],dev_ids_found) == -1) {
-                       dev_ids_found.push(data[0]);
-                       if ($.inArray(data[0],panels) == -1) {
-                           create_panel(data[0],data[4]);
+                   dev_data = entries[i].split(":");
+                   if ($.inArray(dev_data[0],dev_ids_found) == -1) {
+                       dev_ids_found.push(dev_data[0]);
+                       if ($.inArray(dev_data[0],panels) == -1) {
+                           create_panel(dev_data[0],dev_data[4]);
                        } 
-                       $("#"+data[0]+"_TiltLR").text(data[1]);
-                       $("#"+data[0]+"_TiltFB").text(data[2]);
-                       $("#"+data[0]+"_Direction").text(data[3]);
+                       $("#"+dev_data[0]+"_TiltLR").text(dev_data[1]);
+                       $("#"+dev_data[0]+"_TiltFB").text(dev_data[2]);
+                       $("#"+dev_data[0]+"_Direction").text(dev_data[3]);
                    }
                } 
            
@@ -136,5 +141,5 @@
     }, 500);
 
 </script> 
-
+</body>
 </html>

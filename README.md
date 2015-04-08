@@ -40,6 +40,6 @@ Running locally
 
 ## Accessing the tool
 
- 1. Access the site at 'http://<hostname>' from a mobile device to begin sending data
- 2. While data is entering the application from your mobile device, access 'http://<hostname>/show' to view the results
+ 1. Access the site at 'http://*hostname*' from a mobile device to begin sending data
+ 2. While data is entering the application from your mobile device, access 'http://*hostname*/show' to view the results
 

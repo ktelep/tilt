@@ -32,14 +32,16 @@ def index_page():
 @app.route('/send', methods=['POST'])
 def receive_post_data():
     if request.method == 'POST':
-        data_line = ":".join([request.form['UUID'],
+        stamp = timestamp()
+        data_line = ":".join([str(stamp),
+                              request.form['UUID'],
                               request.form['TiltLR'],
                               request.form['TiltFB'],
                               request.form['Direction'],
                               request.form['OS']
                               ])
         # Key is uuid:<UUID>, expires in 3 seconds
-        r.zadd('uuid:' + request.form['UUID'], data_line, timestamp())
+        r.zadd('uuid:' + request.form['UUID'], data_line, stamp)
         r.expire('uuid:' + request.form['UUID'], 3)
         return "success"
     return "fail"

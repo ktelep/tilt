@@ -1,20 +1,30 @@
 from flask import Flask, request, render_template, jsonify
-import time
 import os
+import sys
+import time
 import json
 import redis
 
 app = Flask(__name__, static_url_path='/static')
 port = os.getenv('VCAP_APP_PORT', '5000')
 
-rediscloud_service = json.loads(os.environ['VCAP_SERVICES'])['rediscloud'][0]
-credentials = rediscloud_service['credentials']
-pool = redis.ConnectionPool(host=credentials['hostname'],
-                            port=credentials['port'],
-                            password=credentials['password'],
-                            max_connections=2)
+if os.getenv('VCAP_SERVICES'):  # Connect to our Redis service in cloudfoundry
+    redis_service = json.loads(os.environ['VCAP_SERVICES'])['rediscloud'][0]
+    credentials = redis_service['credentials']
+    pool = redis.ConnectionPool(host=credentials['hostname'],
+                                port=credentials['port'],
+                                password=credentials['password'],
+                                max_connections=2)
 
-r = redis.Redis(connection_pool=pool)
+    r = redis.Redis(connection_pool=pool)
+else:   # Local redis server as a failback
+    r = redis.Redis()
+
+try:
+    response = r.client_list()
+except redis.ConnectionError:
+    print "Unable to connect to a Redis server, check environment"
+    sys.exit(1)
 
 
 def timestamp():
@@ -52,17 +62,6 @@ def show():
     return render_template('dynamic.html')
 
 
-@app.route('/dump')
-def spring_dump():
-    valid_keys = r.keys('uuid:*')
-    data = list()
-    max_score = timestamp()
-    for key in valid_keys:
-        data.extend(r.zrange(key, 0, max_score))
-        r.zremrangebyscore(key, 0, max_score)
-    return ",".join(map(str, data))
-
-
 @app.route('/safe_dump', methods=['GET', 'POST'])
 def safe_dump():
     min_score = int(request.args.get('min_score', 0))
@@ -75,5 +74,5 @@ def safe_dump():
 
 if __name__ == '__main__':
     app.debug = True
-    print "Port" + port
+    print "Running on Port: " + port
     app.run(host='0.0.0.0', port=int(port))

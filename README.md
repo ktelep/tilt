@@ -25,16 +25,19 @@ From the root of the repo
  3. Review the manifest.yml file
  4. Push the app
 
+
     cf push 
 
 Running locally
 
  1. Clone this repostory
  2. Install the necessary python modules 
-    
+   
+
     pip install -r requirements.txt
 
  3. Execute the application
+
 
     python tilt_server.py
 

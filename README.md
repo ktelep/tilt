@@ -45,21 +45,23 @@ Running locally
 
 ## Loading data into Hadoop via Spring-XD
 
-One of the goals of this project was to demonstrate loading data into Hadoop and running queries via HAWQ and
-visualizations via other tools, so we have to get the data in there.  This could be done by simply POSTing the data from
-the tilt _ server.py script directly to Spring, but without knowing where the Spring-XD server would be, a script was
-created (collect.py found in the contrib folder) to pull data from redis and write it to a local file, which can then be
-monitored by Spring-XD and loaded thusly.
+One of the goals of this project was to demonstrate loading data into Hadoop and running queries via HAWQ and visualizations via other tools, so we have to get the data in there.  
 
- 1. Copy contrib/collect.py to a convenient location on your system
- 2. Edit the collect.py script to reflect the appropriate URL and location you wish it to write the output file to
+To do this, we deployed a Pivotal HD VM and then installed Spring-XD onto that same VM.   
+
+This could be done by simply POSTing the data from the tilt _ server.py script directly to Spring, but without knowing where the Spring-XD server would be, a script was created (collect.py found in the contrib folder) to pull data from the tilt _ server and write it to a local file, which can then be monitored by Spring-XD and loaded thusly.
+
+The process for implementing this:
+
+ 1. Copy contrib/collect.py to a convenient location on your VM.
+ 2. Edit the collect.py script to reflect the appropriate URL for the tilt and location you wish it to write the output file.
  3. Run collect.py via nohup or supervisord or in another terminal window as you move on.
 
 Once you have confirmed that collect.py is running and data is being written to the log file when you move your mobile
 device, you can setup the Spring-XD stream.  You will first want to confirm that your Spring-XD install is talking to
 your Hadoop cluster, which is outside of the scope of this document.
 
-   xd> stream create --name tilt --definition "tail --lines=1 --name=/home/gpadmin/tilt _ collect/tilt _ output.log | hdfs --rollover=256" --deploy
+    xd> stream create --name tilt --definition "tail --lines=1 --name=/home/gpadmin/tilt _ collect/tilt _ output.log | hdfs --rollover=256" --deploy
 
 At this point you should be able to look in the hdfs filesystem and see a /xd/tilt/tilt-#.txt file being created as your
 move your device (assuming collect.py is still running).  

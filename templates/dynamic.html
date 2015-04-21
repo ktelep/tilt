@@ -10,7 +10,9 @@
   <body>
   <div class="container">
   <div class="page-header">
-     <h1>Tilt Data Output Demo</h1>
+      <h1>Tilt Data Output Demo</h1>
+      <div id="server_info" class="form form-inline">
+      </div>
   </div>
   <div class="row">
      <div id="b1" class="col-md-4 outputpanel"></div>
@@ -33,12 +35,27 @@
   <script type="text/javascript">
 
     var panels = [];
+    var servers = [];
     zero_counter = 0;
     min_ts = 0; 
 
     $(document).ready(function() {
         $.ajaxSetup({ cache: false });
         });
+
+    function create_server(server_port) {
+        var server_template = '<button id="server_' + server_port + '" class="btn btn-primary">' +
+                          'Server ' + server_port + ': <span id="server_' + server_port + '_val" ' +
+                          'class="badge">0</span></button>';
+        $("#server_info").append(server_template)
+        servers.push(server_port)
+        return
+    }
+
+    function destroy_server(server_port) {
+        $('#server_' + server_port).remove();
+        return
+    }
 
     function create_panel(dev_id,os){
         // Grab a list of output panel divs
@@ -133,8 +150,31 @@
                    }
                    zero_counter=0;
                }
-            }
-        });
+           }
+
+           entries = pos_data.instance;
+           servers_found = [];
+           if (entries.length > 0) {
+               servers_found = [];
+               for (var i=0; i < entries.length; i++) {
+                   server_data = entries[i].split(":");
+                   server_data.shift();
+
+                   // If we don't know this server, add it
+                   if ($.inArray(server_data[0],servers) == -1) {
+                       create_server(server_data[0]);
+                   }
+                   servers_found.push(server_data[0])
+                   $("#server_"+server_data[0]+"_val").text(server_data[1]);
+               }
+               for (var i=0; i < servers.length; i++) {
+                   if ($.inArray(servers[i], servers_found) == -1) {
+                       destroy_server(servers[i]);
+                   }
+               }
+           }
+        
+       });
     } 
     load_data();
     setInterval(function(){

@@ -21,7 +21,11 @@ else:   # Local redis server as a failback
     r = redis.Redis()
 
 try:
+    # Test our connection
     response = r.client_list()
+    r.set("server:" + port, 0)
+    r.expire("server:" + port, 3)
+
 except redis.ConnectionError:
     print "Unable to connect to a Redis server, check environment"
     sys.exit(1)
@@ -53,6 +57,8 @@ def receive_post_data():
         # Key is uuid:<UUID>, expires in 3 seconds
         r.zadd('uuid:' + request.form['UUID'], data_line, stamp)
         r.expire('uuid:' + request.form['UUID'], 3)
+        r.incr('server:' + port)
+        r.expire('server:' + port, 3)
         return "success"
     return "fail"
 
@@ -67,10 +73,15 @@ def safe_dump():
     min_score = int(request.args.get('min_score', 0))
     valid_keys = r.keys('uuid:*')
     data = list()
+    instances = list()
     max_score = timestamp()
     for key in valid_keys:
         data.extend(r.zrangebyscore(key, min_score, max_score))
-    return jsonify(timestamp=max_score, data=data, min_score=min_score)
+    for key in r.keys('server:*'):
+        inst = "%s:%s" % (key, r.get(key))
+        instances.append(inst)
+    return jsonify(timestamp=max_score, data=data, min_score=min_score,
+                   instance=instances)
 
 if __name__ == '__main__':
     app.debug = True

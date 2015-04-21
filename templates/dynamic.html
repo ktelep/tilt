@@ -44,7 +44,7 @@
         });
 
     function create_server(server_port) {
-        var server_template = '<button id="server_' + server_port + '" class="btn btn-primary">' +
+        var server_template = '<button id="server_' + server_port + '" class="btn btn-primary" style="margin: 5px">' +
                           'Server ' + server_port + ': <span id="server_' + server_port + '_val" ' +
                           'class="badge">0</span></button>';
         $("#server_info").append(server_template)
@@ -54,6 +54,7 @@
 
     function destroy_server(server_port) {
         $('#server_' + server_port).remove();
+        servers.splice($.inArray(server_port,servers), 1);
         return
     }
 

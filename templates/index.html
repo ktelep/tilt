@@ -25,9 +25,15 @@
 <body role="document">
   <div class="top">
       <section class="panel panel-default">
-          <header class="panel-heading">
-             <h3 id=devid class="panel-title">Device Orientation</h3>
-          </header>
+      <header class="panel-heading clearfix">
+      <h3 id=devid class="panel-title pull-left" style="padding-top: 7.5px;">Device ID:&nbsp;&nbsp;</h3>
+      <div class="input-group">
+          <input class="form-control" type=text id="devid_val">
+          <div class="input-group-btn">
+              <button class="btn btn-primary" onclick="setDevID()">Set</button>
+          </div>
+      </div>
+      </header>
           <div class="panel-body">
               <form class="form-horizontal">
               <div class="form-group">
@@ -63,6 +69,7 @@
   <script type="text/javascript">
     init();
     var url = "/send";
+    var dev_id;
 
     function guid() {
       function s4() {
@@ -73,10 +80,16 @@
       return s4() + '-' + s4()
     }
 
+    function setDevID() {
+        var newID =  document.getElementById("devid_val").value;
+        console.log(newID);
+        dev_id = newID;
+    }
+
     function init() {
  
-      var dev_id = guid()
-      document.getElementById("devid").innerHTML = "Device ID: "+ dev_id
+      dev_id = guid()
+      document.getElementById("devid_val").value = dev_id
 
       var os = "";
       var ua = navigator.userAgent;

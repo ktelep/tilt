@@ -35,7 +35,7 @@
       </div>
       </header>
           <div class="panel-body">
-              <form class="form-horizontal">
+              <form class="form-horizontal" action="#">
               <div class="form-group">
                   <label for="TiltLR" class="control-label col-xs-6">Left/Right Tilt</label>
                   <div class="col-xs-6">
@@ -54,6 +54,7 @@
                   <input class="form-control" type="text" name="Direction" id="Direction" />
                   </div>
               </div>
+              </form>
          </div>
       </section>
   </div>
@@ -82,8 +83,10 @@
 
     function setDevID() {
         var newID =  document.getElementById("devid_val").value;
-        console.log(newID);
-        dev_id = newID;
+        sanitized_ID = newID.replace(/ /gi,'_');
+        document.getElementById("devid_val").value = sanitized_ID
+        console.log(newID + ":" + sanitizedID);
+        dev_id = sanitizedID;
     }
 
     function init() {

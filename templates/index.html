@@ -12,7 +12,7 @@
          }
 
          .logo {
-             width:275px;
+             width:250px;
              margin-left: auto;
              margin-right: auto;
              display: block;
@@ -24,6 +24,17 @@
              display: block;
              float: left;
              margin-left: 5px;
+         }
+
+         .row-centered {
+            text-align:center;
+         }
+
+         .col-centered {
+               display:inline-block;
+               float:none;
+               /* inline-block space fix */
+               margin-right:-4px;
          }
 
       </style>
@@ -41,22 +52,22 @@
           </div>
       </div>
       </header>
-          <div class="panel-body">
-              <form class="form-horizontal" action="#">
-              <div class="form-group col-md-3" style="margin: 5px;">
-                  <label for="TiltLR" class="control-label">Roll</label><br>
-                  <input class="form-control" type="text" name="TiltLR" id="TiltLR" />
-              </div>
-              <div class="form-group col-md-3" style="margin: 5px;">
-                  <label for="TiltFB" class="control-label">Pitch</label><br>
-                  <input class="form-control" type="text" name="TiltFB" id="TiltFB" />
-              </div>
-              <div class="form-group col-md-3" style="margin: 5px;">
-                  <label for="Direction" class="control-label">Yaw</label><br>
-                  <input class="form-control" type="text" name="Direction" id="Direction" />
-              </div>
-              </form>
-         </div>
+      <div class="panel-body">
+          <div class="row row-centered">
+                  <div class="col-centered text-center col-xs-3 col-md-3">
+                     <h4>Roll</h4>
+                     <input class="form-control" type="text" name="TiltLR" id="TiltLR" />
+                 </div>
+                 <div class="col-centered text-center col-xs-3 col-md-3">
+                     <h4>Pitch</h4>
+                     <input class="form-control" type="text" name="TiltFB" id="TiltFB" />
+                  </div>
+                  <div class="col-centered text-center col-xs-3 col-md-3">
+                      <h4>Yaw</h4>
+                      <input class="form-control" type="text" name="Direction" id="Direction" />
+                  </div>
+          </div>
+      </div>
       </section>
   </div>
 
@@ -152,10 +163,6 @@
       }
     }
     
-    
-    // Some other fun rotations to try...
-    //var rotation = "rotate3d(0,1,0, "+ (tiltLR*-1)+"deg) rotate3d(1,0,0, "+ (tiltFB*-1)+"deg)";
-    //var rotation = "rotate("+ tiltLR +"deg) rotate3d(0,1,0, "+ (tiltLR*-1)+"deg) rotate3d(1,0,0, "+ (tiltFB*-1)+"deg)";
   </script>
   
 

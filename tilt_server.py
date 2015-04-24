@@ -57,6 +57,8 @@ def receive_post_data():
         # Key is uuid:<UUID>, expires in 3 seconds
         r.zadd('uuid:' + request.form['UUID'], data_line, stamp)
         r.expire('uuid:' + request.form['UUID'], 3)
+
+        # Update # of connections processed
         r.incr('server:' + port)
         r.expire('server:' + port, 3)
         return "success"

@@ -43,23 +43,17 @@
       </header>
           <div class="panel-body">
               <form class="form-horizontal" action="#">
-              <div class="form-group">
-                  <label for="TiltLR" class="control-label col-xs-6">Left/Right Tilt</label>
-                  <div class="col-xs-6">
+              <div class="form-group col-md-3" style="margin: 5px;">
+                  <label for="TiltLR" class="control-label">Roll</label><br>
                   <input class="form-control" type="text" name="TiltLR" id="TiltLR" />
-                  </div>
               </div>
-              <div class="form-group">
-                  <label for="TiltFB" class="control-label col-xs-6">Front/Back Tilt</label>
-                  <div class="col-xs-6">
+              <div class="form-group col-md-3" style="margin: 5px;">
+                  <label for="TiltFB" class="control-label">Pitch</label><br>
                   <input class="form-control" type="text" name="TiltFB" id="TiltFB" />
-                  </div>
               </div>
-              <div class="form-group">
-                  <label for="Direction" class="control-label col-xs-6">Direction</label>
-                  <div class="col-xs-6">
+              <div class="form-group col-md-3" style="margin: 5px;">
+                  <label for="Direction" class="control-label">Yaw</label><br>
                   <input class="form-control" type="text" name="Direction" id="Direction" />
-                  </div>
               </div>
               </form>
          </div>
@@ -94,7 +88,7 @@
         sanitized_ID = newID.replace(/ /gi,'_');
         document.getElementById("devid_val").value = sanitized_ID
         console.log(newID + ":" + sanitizedID);
-        dev_id = sanitizedID;
+        dev_id = sanitized_ID;
     }
 
     function init() {

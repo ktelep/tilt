@@ -33,15 +33,21 @@
          .col-centered {
                display:inline-block;
                float:none;
-               /* inline-block space fix */
                margin-right:-4px;
          }
+
+        .vcenter {
+              height: 60px;
+              display: table-cell;
+              vertical-align: bottom;
+              float:none;
+        }
 
       </style>
 
   </head>
 <body role="document">
-  <div class="top">
+  <div class="row">
       <section class="panel panel-default">
       <header class="panel-heading clearfix">
       <h3 id=devid class="panel-title pull-left" style="padding-top: 7.5px;">Device ID:&nbsp;&nbsp;</h3>
@@ -75,8 +81,18 @@
     <img src="{{ url_for('static', filename='EMC-Logo.png') }}" id="imgLogo" class="logo">
   </div>
 
-  <div class="bottom">
-    <img src="{{ url_for('static', filename='Pathfinder-Logo.png') }}" id="pfLogo" class="pflogo">
+  <div class="container">
+      <div class="row">
+           <div class="col-xs-3 col-md-3 text-center">
+               <img src="{{ url_for('static', filename='Pathfinder-Logo.png') }}" id="pfLogo" class="pflogo">
+           </div>
+           <div class="col-xs-9 col-md-9 vcenter">
+              <div class="btn-group" role="group" style="float:right;">
+                  <button type="button" class="btn btn-primary">GPS Disabled</button>
+                  <button type="button" class="btn btn-default">GPS Enabled</button>
+              </div>
+           </div>
+      </div>
   </div>
 
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>

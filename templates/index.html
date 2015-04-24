@@ -19,6 +19,13 @@
              padding: 15px;
          }
 
+         .pflogo {
+             width:50px;
+             display: block;
+             float: left;
+             margin-left: 5px;
+         }
+
       </style>
 
   </head>
@@ -64,6 +71,7 @@
   </div>
 
   <div class="bottom">
+    <img src="{{ url_for('static', filename='Pathfinder-Logo.png') }}" id="pfLogo" class="pflogo">
   </div>
 
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>

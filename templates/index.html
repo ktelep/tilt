@@ -4,6 +4,8 @@
       <meta charset="utf-8">
       <meta http-equiv="X-UA-Compatible" content="IE=edge">
       <meta name="viewport" content="width=device-width, initial-scale=1"><meta charset="UTF-8">
+      <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+      <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
       <link href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
       <link href="{{ url_for('static', filename='bootstrap/css/bootstrap-theme.min.css') }}" rel="stylesheet">
       <style>  
@@ -46,19 +48,33 @@
       </style>
 
   </head>
-<body role="document">
+  <body role="document">
+      <div class="container">
   <div class="row">
       <section class="panel panel-default">
       <header class="panel-heading clearfix">
-      <h3 id=devid class="panel-title pull-left" style="padding-top: 7.5px;">Device ID:&nbsp;&nbsp;</h3>
-      <div class="input-group">
-          <input class="form-control" type=text id="devid_val">
-          <div class="input-group-btn">
-              <button class="btn btn-primary" onclick="setDevID()">Set</button>
-          </div>
-      </div>
+          <h3 id=devid class="panel-title pull-left" style="padding-top: 7.5px;">Device ID:&nbsp;&nbsp;<span id=devid_val></span></h3>
+          <button class="btn btn-primary" style="float: right;" onclick="$('#settings').collapse('toggle')">Settings</button>
       </header>
       <div class="panel-body">
+          <div id="settings" class="collapse">
+                  <div class="form-group form-inline">
+                      <label for="device_id_alias">Device ID:</label>
+                      <div class="input-group">
+                          <input type="text" id="device_id_alias" class="form-control" style="margin-left: 2px;">
+                          <div class="input-group-btn">
+                               <button class="btn btn-primary" onclick="setDevID()">Set</button>
+                           </div>
+                       </div>
+                  </div>
+                  <div class="form-group">
+                      <label for="gps_enabled">GPS Status: </label>
+                      <div class="btn-group" role="group">
+                          <button id="GPSenable" type="button" class="btn btn-default" onclick="toggleGPS()">Enabled</button>
+                          <button id="GPSdisable" type="button" class="btn btn-danger" onclick="toggleGPS()">Disabled</button>
+                      </div>
+                  </div>
+          </div>
           <div class="row row-centered">
                   <div class="col-centered text-center col-xs-3 col-md-3">
                      <h4>Roll</h4>
@@ -83,6 +99,7 @@
 
   <div class="container">
       <div class="row">
+          <!--
            <div class="col-xs-3 col-md-3 text-center">
                <img src="{{ url_for('static', filename='Pathfinder-Logo.png') }}" id="pfLogo" class="pflogo">
            </div>
@@ -91,15 +108,16 @@
                   <button type="button" class="btn btn-primary">GPS Disabled</button>
                   <button type="button" class="btn btn-default">GPS Enabled</button>
               </div>
-           </div>
+          </div>
+          -->
       </div>
   </div>
-
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+  </div>
   <script type="text/javascript">
     init();
     var url = "/send";
     var dev_id;
+    var GPS_enabled = 0;
 
     function guid() {
       function s4() {
@@ -110,18 +128,34 @@
       return s4() + '-' + s4()
     }
 
+    function toggleGPS() {
+        console.log(GPS_enabled);
+        if (GPS_enabled == 0) {
+            $("#GPSdisable").removeClass('btn-danger');
+            $("#GPSdisable").addClass('btn-default');
+            $("#GPSenable").addClass('btn-success');
+            GPS_enabled = 1;
+        } else {
+            $("#GPSenable").removeClass('btn-success');
+            $("#GPSenable").addClass('btn-default');
+            $("#GPSdisable").addClass('btn-danger');
+            GPS_enabled = 0;
+        }
+    }
+
     function setDevID() {
-        var newID =  document.getElementById("devid_val").value;
+        var newID =  $("#device_id_alias").val();
         sanitized_ID = newID.replace(/ /gi,'_');
-        document.getElementById("devid_val").value = sanitized_ID
-        console.log(newID + ":" + sanitizedID);
+        $("#devid_val").text(sanitized_ID);
+        console.log(newID + ":" + sanitized_ID);
+        $("#device_id_alias").val("");
         dev_id = sanitized_ID;
     }
 
     function init() {
  
       dev_id = guid()
-      document.getElementById("devid_val").value = dev_id
+      $("#devid_val").text(dev_id)
 
       var os = "";
       var ua = navigator.userAgent;
@@ -169,7 +203,12 @@
 
       update_count++;
       if (update_count == 5) {
-          // Send our data to the server 
+          // Send our data to the server and grab GPS if we're also sending that
+          if (GPS_enabled == 1) {
+              navigator.geolocation.getCurrentPosition(function(position) {
+                      console.log(position);
+                      });
+          } 
           $.ajax({
               type: "POST",
               url: url,

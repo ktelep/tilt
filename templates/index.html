@@ -99,25 +99,18 @@
 
   <div class="container">
       <div class="row">
-          <!--
            <div class="col-xs-3 col-md-3 text-center">
                <img src="{{ url_for('static', filename='Pathfinder-Logo.png') }}" id="pfLogo" class="pflogo">
            </div>
-           <div class="col-xs-9 col-md-9 vcenter">
-              <div class="btn-group" role="group" style="float:right;">
-                  <button type="button" class="btn btn-primary">GPS Disabled</button>
-                  <button type="button" class="btn btn-default">GPS Enabled</button>
-              </div>
-          </div>
-          -->
       </div>
   </div>
   </div>
   <script type="text/javascript">
-    init();
     var url = "/send";
     var dev_id;
     var GPS_enabled = 0;
+
+    init();
 
     function guid() {
       function s4() {
@@ -193,7 +186,7 @@
       document.getElementById("TiltFB").value = Math.round(tiltFB);
       document.getElementById("Direction").value = Math.round(dir);
      
-      var position = {UUID: dev_id, TiltLR: tiltLR, TiltFB: tiltFB, Direction: dir, OS: os};
+      var data = {UUID: dev_id, TiltLR: tiltLR, TiltFB: tiltFB, Direction: dir, OS: os};
 
       // Apply the transform to the image
       var logo = document.getElementById("imgLogo");
@@ -206,13 +199,16 @@
           // Send our data to the server and grab GPS if we're also sending that
           if (GPS_enabled == 1) {
               navigator.geolocation.getCurrentPosition(function(position) {
-                      console.log(position);
+                      data["latitude"]=position.coords.latitude;
+                      data["longitude"]=position.coords.longitude;
+                      data["altitude"]=position.coords.altitude;
+                      console.log(data);
                       });
           } 
           $.ajax({
               type: "POST",
               url: url,
-              data: position,
+              data: data,
               }); 
           update_count = 0;
       }

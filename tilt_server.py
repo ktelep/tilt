@@ -52,7 +52,10 @@ def receive_post_data():
                               request.form['TiltLR'],
                               request.form['TiltFB'],
                               request.form['Direction'],
-                              request.form['OS']
+                              request.form['OS'],
+                              request.form['latitude'],
+                              request.form['longitude'],
+                              request.form['altitude']
                               ])
         # Key is uuid:<UUID>, expires in 3 seconds
         r.zadd('uuid:' + request.form['UUID'], data_line, stamp)

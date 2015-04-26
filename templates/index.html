@@ -94,7 +94,7 @@
   </div>
 
   <div class="container" style="-webkit-perspective: 300; perspective: 300;">
-    <img src="{{ url_for('static', filename='EMC-Logo.png') }}" id="imgLogo" class="logo">
+    <img src="{{ url_for('static', filename='EMC-Federation-Logo.png') }}" id="imgLogo" class="logo">
   </div>
 
   <div class="container">
@@ -106,11 +106,12 @@
   </div>
   </div>
   <script type="text/javascript">
+    init();
     var url = "/send";
     var dev_id;
     var GPS_enabled = 0;
-
-    init();
+    var GPS_data = { latitude: 0, longitude: 0, altitude: 0 };
+    var update_count = 0;
 
     function guid() {
       function s4() {
@@ -127,13 +128,15 @@
             $("#GPSdisable").addClass('btn-default');
             $("#GPSenable").addClass('btn-success');
             GPS_enabled = 1;
+            getGPSData();
         } else {
             $("#GPSenable").removeClass('btn-success');
             $("#GPSenable").addClass('btn-default');
             $("#GPSdisable").addClass('btn-danger');
             GPS_enabled = 0;
+            getGPSData();
         }
-        console.log("Toggled GPS to:",GPS_enabled)
+        console.log("Toggled GPS to:",GPS_enabled);
     }
 
     function setDevID() {
@@ -160,7 +163,6 @@
           os = "Unknown";
       }
 
-      update_count = 0;
       if (window.DeviceOrientationEvent) {
         // Listen for the deviceorientation event and handle the raw data
         window.addEventListener('deviceorientation', function(eventData) {
@@ -182,47 +184,59 @@
     }
   
 function deviceOrientationHandler(tiltLR, tiltFB, dir, dev_id, os) {
-      var data;
-      document.getElementById("TiltLR").value = Math.round(tiltLR);
-      document.getElementById("TiltFB").value = Math.round(tiltFB);
-      document.getElementById("Direction").value = Math.round(dir);
+    var data;
+
+    document.getElementById("TiltLR").value = Math.round(tiltLR);
+    document.getElementById("TiltFB").value = Math.round(tiltFB);
+    document.getElementById("Direction").value = Math.round(dir);
      
-      data = {devid: dev_id, TiltLR: tiltLR, TiltFB: tiltFB, Direction: dir, OS: os};
+    data = {devid: dev_id, 
+        TiltLR: tiltLR, 
+        TiltFB: tiltFB, 
+        Direction: dir, 
+        OS: os,
+        latitude: GPS_data.latitude,
+        longitude: GPS_data.longitude,
+        altitude: GPS_data.altitude
+    };
 
-      // Apply the transform to the image
-      var logo = document.getElementById("imgLogo");
-      logo.style.webkitTransform = "rotate("+ tiltLR +"deg) rotate3d(1,0,0, "+ (tiltFB*-1)+"deg)";
-      logo.style.MozTransform = "rotate("+ tiltLR +"deg)";
-      logo.style.transform = "rotate("+ tiltLR +"deg) rotate3d(1,0,0, "+ (tiltFB*-1)+"deg)";
+    // Apply the transform to the image
+    var logo = document.getElementById("imgLogo");
+    logo.style.webkitTransform = "rotate("+ tiltLR +"deg) rotate3d(1,0,0, "+ (tiltFB*-1)+"deg)";
+    logo.style.MozTransform = "rotate("+ tiltLR +"deg)";
+    logo.style.transform = "rotate("+ tiltLR +"deg) rotate3d(1,0,0, "+ (tiltFB*-1)+"deg)";
 
-      update_count++;
-      if (update_count == 5) {
-          if (GPS_enabled == 1) {
-              // GPS is an async callback function, so we need to make the ajax call within
-              // it's associated closure function
-              navigator.geolocation.getCurrentPosition(function(position) {
-
-                      data["latitude"] = position.coords.latitude;
-                      data["longitude"] = position.coords.longitude;
-                      data["altitude"] = position.coords.altitude;
-
-                      $.ajax({ 
-                        type: "POST",
-                        url: url,
-                        data: { data: JSON.stringify(data) }
-                        });
-                      });
-          } else {
-                $.ajax({
-                   type: "POST",
-                   url: url,
-                   data: { data: JSON.stringify(data) }
-                   }); 
-          }
-          update_count = 0;
-      }
+    update_count++;
+    if (update_count == 5) {
+        $.ajax({
+        type: "POST",
+        url: url,
+        data: { data: JSON.stringify(data) }
+        }); 
+        update_count = 0;
     }
+}
     
+
+function getGPSData() {
+    if (GPS_enabled == 1) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            GPS_data.latitude = position.coords.latitude;
+            GPS_data.longitude = position.coords.longitude;
+            GPS_data.altitude = position.coords.altitude;
+        });
+    } else {
+        // Clear the GPS data if it's disabled
+        GPS_Data.latitude = 0;
+        GPS_Data.longitude = 0;
+        GPS_Data.altitude = 0;
+    }
+}  
+
+    // Update GPS Data every 5 minutes (assuming it's enabled)
+    setInterval(function(){
+               getGPSData();
+                  }, 300000);
   </script>
   
 

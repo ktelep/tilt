@@ -122,7 +122,6 @@
     }
 
     function toggleGPS() {
-        console.log(GPS_enabled);
         if (GPS_enabled == 0) {
             $("#GPSdisable").removeClass('btn-danger');
             $("#GPSdisable").addClass('btn-default');
@@ -134,13 +133,14 @@
             $("#GPSdisable").addClass('btn-danger');
             GPS_enabled = 0;
         }
+        console.log("Toggled GPS to:",GPS_enabled)
     }
 
     function setDevID() {
         var newID =  $("#device_id_alias").val();
         sanitized_ID = newID.replace(/ /gi,'_');
         $("#devid_val").text(sanitized_ID);
-        console.log(newID + ":" + sanitized_ID);
+        console.log("Unsanitized ID:",newID,"Sanitized ID:",sanitized_ID)
         $("#device_id_alias").val("");
         dev_id = sanitized_ID;
     }
@@ -181,12 +181,13 @@
       }
     }
   
-    function deviceOrientationHandler(tiltLR, tiltFB, dir, dev_id, os) {
+function deviceOrientationHandler(tiltLR, tiltFB, dir, dev_id, os) {
+      var data;
       document.getElementById("TiltLR").value = Math.round(tiltLR);
       document.getElementById("TiltFB").value = Math.round(tiltFB);
       document.getElementById("Direction").value = Math.round(dir);
      
-      var data = {UUID: dev_id, TiltLR: tiltLR, TiltFB: tiltFB, Direction: dir, OS: os};
+      data = {devid: dev_id, TiltLR: tiltLR, TiltFB: tiltFB, Direction: dir, OS: os};
 
       // Apply the transform to the image
       var logo = document.getElementById("imgLogo");
@@ -196,20 +197,28 @@
 
       update_count++;
       if (update_count == 5) {
-          // Send our data to the server and grab GPS if we're also sending that
           if (GPS_enabled == 1) {
+              // GPS is an async callback function, so we need to make the ajax call within
+              // it's associated closure function
               navigator.geolocation.getCurrentPosition(function(position) {
-                      data["latitude"]=position.coords.latitude;
-                      data["longitude"]=position.coords.longitude;
-                      data["altitude"]=position.coords.altitude;
-                      console.log(data);
+
+                      data["latitude"] = position.coords.latitude;
+                      data["longitude"] = position.coords.longitude;
+                      data["altitude"] = position.coords.altitude;
+
+                      $.ajax({ 
+                        type: "POST",
+                        url: url,
+                        data: { data: JSON.stringify(data) }
+                        });
                       });
-          } 
-          $.ajax({
-              type: "POST",
-              url: url,
-              data: data,
-              }); 
+          } else {
+                $.ajax({
+                   type: "POST",
+                   url: url,
+                   data: { data: JSON.stringify(data) }
+                   }); 
+          }
           update_count = 0;
       }
     }

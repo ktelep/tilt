@@ -130,16 +130,15 @@
                // We want to display just the latest entry from each device id we know
                dev_ids_found = [];
                for (var i=0; i<entries.length; i++) {
-                   dev_data = entries[i].split(":");
-                   dev_data.shift();
-                   if ($.inArray(dev_data[0],dev_ids_found) == -1) {   // Entry not already found
-                       dev_ids_found.push(dev_data[0]);
-                       if ($.inArray(dev_data[0],panels) == -1) {      // If we don't have a panel, create one
-                           create_panel(dev_data[0],dev_data[4]);
+                   dev_data = JSON.parse(entries[i])
+                   if ($.inArray(dev_data.devid,dev_ids_found) == -1) {   // Entry not already found
+                       dev_ids_found.push(dev_data.devid);
+                       if ($.inArray(dev_data.devid,panels) == -1) {      // If we don't have a panel, create one
+                           create_panel(dev_data.devid,dev_data.os);
                        } 
-                       $("#"+dev_data[0]+"_TiltLR").text(dev_data[1]);
-                       $("#"+dev_data[0]+"_TiltFB").text(dev_data[2]);
-                       $("#"+dev_data[0]+"_Direction").text(dev_data[3]);
+                       $("#"+dev_data.devid+"_TiltLR").text(dev_data.TiltLR);
+                       $("#"+dev_data.devid+"_TiltFB").text(dev_data.TiltFB);
+                       $("#"+dev_data.devid+"_Direction").text(dev_data.Direction);
                    }
                } 
            

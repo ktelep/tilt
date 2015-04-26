@@ -46,20 +46,14 @@ def index_page():
 @app.route('/send', methods=['POST'])
 def receive_post_data():
     if request.method == 'POST':
-        stamp = timestamp()
-        data_line = ":".join([str(stamp),
-                              request.form['UUID'],
-                              request.form['TiltLR'],
-                              request.form['TiltFB'],
-                              request.form['Direction'],
-                              request.form['OS'],
-                              request.form['latitude'],
-                              request.form['longitude'],
-                              request.form['altitude']
-                              ])
-        # Key is uuid:<UUID>, expires in 3 seconds
-        r.zadd('uuid:' + request.form['UUID'], data_line, stamp)
-        r.expire('uuid:' + request.form['UUID'], 3)
+        current_time = timestamp()
+        client_data = json.loads(request.form['data'])
+        client_data['timestamp'] = current_time
+
+        # Key is devid:<UUID>, expires in 3 seconds
+        r.zadd('devid:' + client_data['devid'],
+               json.dumps(client_data), current_time)
+        r.expire('devid:' + client_data['devid'], 3)
 
         # Update # of connections processed
         r.incr('server:' + port)
@@ -76,7 +70,7 @@ def show():
 @app.route('/safe_dump', methods=['GET', 'POST'])
 def safe_dump():
     min_score = int(request.args.get('min_score', 0))
-    valid_keys = r.keys('uuid:*')
+    valid_keys = r.keys('devid:*')
     data = list()
     instances = list()
     max_score = timestamp()

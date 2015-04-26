@@ -134,7 +134,6 @@
             $("#GPSenable").addClass('btn-default');
             $("#GPSdisable").addClass('btn-danger');
             GPS_enabled = 0;
-            getGPSData();
         }
         console.log("Toggled GPS to:",GPS_enabled);
     }
@@ -189,7 +188,13 @@ function deviceOrientationHandler(tiltLR, tiltFB, dir, dev_id, os) {
     document.getElementById("TiltLR").value = Math.round(tiltLR);
     document.getElementById("TiltFB").value = Math.round(tiltFB);
     document.getElementById("Direction").value = Math.round(dir);
-     
+
+    if (GPS_enabled == 0) {
+        GPS_data.latitude = 0;
+        GPS_data.longitude = 0;
+        GPS_data.altitude = 0;
+    }
+
     data = {devid: dev_id, 
         TiltLR: tiltLR, 
         TiltFB: tiltFB, 

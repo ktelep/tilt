@@ -134,7 +134,7 @@
                    if ($.inArray(dev_data.devid,dev_ids_found) == -1) {   // Entry not already found
                        dev_ids_found.push(dev_data.devid);
                        if ($.inArray(dev_data.devid,panels) == -1) {      // If we don't have a panel, create one
-                           create_panel(dev_data.devid,dev_data.os);
+                           create_panel(dev_data.devid,dev_data.OS);
                        } 
                        $("#"+dev_data.devid+"_TiltLR").text(dev_data.TiltLR);
                        $("#"+dev_data.devid+"_TiltFB").text(dev_data.TiltFB);

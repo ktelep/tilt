@@ -3,11 +3,12 @@
 import string
 import requests
 import multiprocessing
+import json
 from time import sleep
 from random import random, choice
 
-url = "http://tilt.cfapps.io/send"
-#url = "http://localhost:5000/send"
+#url = "http://tilt.cfapps.io/send"
+url = "http://localhost:5000/send"
 
 
 def s4(size=4, chars=string.ascii_lowercase + string.digits):
@@ -22,9 +23,9 @@ def worker():
     my_id = guid()
     while True:
         # Create a fake payload with random data
-        payload = dict(UUID=my_id, TiltLR=random(), TiltFB=random(),
+        payload = dict(devid=my_id, TiltLR=random(), TiltFB=random(),
                        Direction=random(), OS="LoadTest")
-        r = requests.post(url, payload)
+        r = requests.post(url, dict(data=json.dumps(payload)))
         if r.status_code != 200:
             print "failed"
         print r.elapsed

@@ -58,7 +58,7 @@
       </header>
       <div class="panel-body">
           <div id="settings" class="collapse">
-                  <div class="form-group form-inline">
+                  <div id="device_id_form" class="form-group form-inline">
                       <label for="device_id_alias">Device ID:</label>
                       <div class="input-group">
                           <input type="text" id="device_id_alias" maxlength="18" class="form-control" style="margin-left: 2px;">
@@ -138,13 +138,37 @@
         console.log("Toggled GPS to:",GPS_enabled);
     }
 
+    function checkDevID(new_devid) {
+        var letters = /^[A-Za-z0-9\-\_]+$/;
+
+        if (/^_+$/.test(new_devid)) {
+            return false;
+        }
+
+        if (letters.test(new_devid)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     function setDevID() {
         var newID =  $("#device_id_alias").val();
         sanitized_ID = newID.replace(/ /gi,'_');
-        $("#devid_val").text(sanitized_ID);
-        console.log("Unsanitized ID:",newID,"Sanitized ID:",sanitized_ID)
-        $("#device_id_alias").val("");
-        dev_id = sanitized_ID;
+        if (checkDevID(sanitized_ID) == true) {
+            // Cleanup The field
+            $("#device_id_form").removeClass("has-error");
+            $("#device_id_alias").attr("placeholder", "").val("").focus().blur();
+
+            // Update our values
+            $("#devid_val").text(sanitized_ID);
+            console.log("Unsanitized ID:",newID,"Sanitized ID:",sanitized_ID)
+            dev_id = sanitized_ID;
+        } else {
+            $("#device_id_form").addClass("has-error");
+            $("#device_id_alias").attr("placeholder", "Invalid Name").val("").focus().blur();
+            console.log("Device ID is not valid (must contain letters, numbers or -/_  spaces will be replaced with _)");
+        }
     }
 
     function init() {

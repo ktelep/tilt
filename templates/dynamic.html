@@ -6,40 +6,43 @@
       <meta name="viewport" content="width=device-width, initial-scale=1"><meta charset="UTF-8">
       <link href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
       <link href="{{ url_for('static', filename='bootstrap/css/bootstrap-theme.min.css') }}" rel="stylesheet">
+      <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+      <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.js') }}"></script>
       <style>
+          h2 a {
+              color: black;
+          }
+
           .pflogo {
               width:60px;
-              display: inline;
               float: right;
               margin-right: 5px;
+          }
+
+          .collapse.width {
+              height: auto;
+              -webkit-transition: width 0.35s ease;
+              -moz-transition: width 0.35s ease;
+              -o-transition: width 0.35s ease;
+              transition: width 0.35s ease;
           }
       </style>
   </head>
   <body>
   <div class="container">
-  <div class="page-header">
-      <h1>Tilt Data Output Demo <img class="pflogo" src="{{ url_for('static', filename='Pathfinder-Logo.png') }}"></h1>
-      <div id="server_info" class="form form-inline">
-      </div>
-  </div>
   <div class="row">
-     <div id="b1" class="col-md-4 outputpanel"></div>
-     <div id="b2" class="col-md-4 outputpanel"></div>
-     <div id="b3" class="col-md-4 outputpanel"></div>
+      <h2><img class="pflogo" src="{{ url_for('static', filename='Pathfinder-Logo.png') }}">
+         <a style="padding-top:10px" data-toggle="collapse" data-target="#server_info">Tilt Data Output</a></h2>
+        <!--<div class="panel panel-default" id="panel1"> --> 
+            <div id="server_info" class="collapse in" style="margin:10px;">
+                <p>CloudFoundry Instances</p>
+            </div>
+        <!-- </div>-->
+      
   </div>
-  <div class="row">
-     <div id="b4" class="col-md-4 outputpanel"></div>
-     <div id="b5" class="col-md-4 outputpanel"></div>
-     <div id="b6" class="col-md-4 outputpanel"></div>
-  </div>
-  <div class="row">
-     <div id="b7" class="col-md-4 outputpanel"></div>
-     <div id="b8" class="col-md-4 outputpanel"></div>
-     <div id="b9" class="col-md-4 outputpanel"></div>
+  <div id="outputpanels" class="row">
   </div>
   </div>
-
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
   <script type="text/javascript">
 
     var panels = [];
@@ -68,10 +71,11 @@
 
     function create_panel(dev_id,os){
         // Grab a list of output panel divs
-        var elements = $('.outputpanel');
+        var root_element = $('#outputpanels');
         var new_pane = 0;
     
-        var panel_template =  '<div class="panel panel-default">' +
+        var panel_template =  '<div class="col-md-4 ' + dev_id +'">' +
+                              '<div class="panel panel-default">' +
                               '<div class="panel-heading clearfix">' +
                               '<h4 class="panel-title pull-left"> Device ID: ' + dev_id +'</h4>' +
                               '<div class="panel-title pull-right">' + os + '</div></div>' +
@@ -80,19 +84,11 @@
                               '<p>Front/Back Tilt: <span id="' + dev_id +'_TiltFB"></span></p>' +
                               '<p>Direction: <span id="' + dev_id +'_Direction"></span></p>' +
                               '</div>' +
+                              '</div>' + 
                               '</div>'
 
-        // Locate the one with no childNodes (empty)
-        for(var i=0; i<elements.length; i++) {
-            if (elements[i].childNodes.length === 0) {
-                new_pane = i;
-                break
-            }
-        }
-
         // Create the panel in the identified pane
-        elements[new_pane].innerHTML = panel_template;
-        elements[new_pane].className = elements[new_pane].className + " " + dev_id;
+        root_element.append(panel_template);
         panels.push(dev_id);
         return;
     }
@@ -101,21 +97,10 @@
         // Super easy with jQuery
         var element = $('.'+dev_id);
         element.empty();
-        element.removeClass(dev_id);
+        element.remove();
 
         // Remove from our list of panels
         panels.splice($.inArray(dev_id,panels), 1);
-
-        // Now we have to shuffle them all down 
-        var elements = $('.outputpanel');
-        for(var i=0; i<elements.length-1; i++) {
-           if (elements[i].childNodes.length === 0) {
-              // Copy the next element, and clear it
-              elements[i].innerHTML = elements[i+1].innerHTML;
-              elements[i].className = elements[i+1].className;
-              elements[i+1].innerHTML = ""
-           }
-        }
     }
 
     function load_data() {

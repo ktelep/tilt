@@ -26,7 +26,7 @@ def s4(size=4, chars=string.ascii_lowercase + string.digits):
 
 
 def guid():
-    return s4()+"-"+s4()
+    return s4()+"-"+s4()+"-Sim"
 
 
 def worker():

@@ -9,7 +9,12 @@ app = Flask(__name__, static_url_path='/static')
 port = os.getenv('VCAP_APP_PORT', '5000')
 
 if os.getenv('VCAP_SERVICES'):  # Connect to our Redis service in cloudfoundry
-    redis_service = json.loads(os.environ['VCAP_SERVICES'])['rediscloud'][0]
+    try:
+        # Pivotal CF
+        redis_service = json.loads(os.environ['VCAP_SERVICES'])['rediscloud'][0]
+    except KeyError:
+        # IBM Bluemix
+        redis_service = json.loads(os.environ['VCAP_SERVICES'])['redis-2.6'][0]
     credentials = redis_service['credentials']
     pool = redis.ConnectionPool(host=credentials['hostname'],
                                 port=credentials['port'],

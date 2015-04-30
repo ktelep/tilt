@@ -1,0 +1,9 @@
+---
+# Manifest for tilt demo application
+# Kurt Telep
+applications:
+- name: tilt
+  scale: 2
+  memory: 256MB
+  services:
+  - TILT_REDIS

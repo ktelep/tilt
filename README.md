@@ -7,8 +7,8 @@ Pivotal Labs, including Cloud Foundry, Spring-XD, Hadoop, and HAWQ.
 
 Running in Cloud Foundry
 * A running Cloud Foundry implementation 
-** Pivotal CF or bosh-lite have been tested
-* Redis service
+** Pivotal CF, IBM Blumix or bosh-lite have been tested
+* Redis service running withing Cloud Foundry
 
 Running locally
 * Python 2.7

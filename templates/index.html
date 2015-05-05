@@ -220,9 +220,9 @@ function deviceOrientationHandler(tiltLR, tiltFB, dir, dev_id, os) {
     }
 
     data = {devid: dev_id, 
-        TiltLR: tiltLR, 
-        TiltFB: tiltFB, 
-        Direction: dir, 
+        TiltLR: checkNull(tiltLR), 
+        TiltFB: checkNull(tiltFB), 
+        Direction: checkNull(dir), 
         OS: os,
         latitude: GPS_data.latitude,
         longitude: GPS_data.longitude,
@@ -246,13 +246,20 @@ function deviceOrientationHandler(tiltLR, tiltFB, dir, dev_id, os) {
     }
 }
     
+function checkNull(value) {
+    if (isNaN(value) || (value == null)) {
+        return 0;
+    } 
+
+    return value
+}
 
 function getGPSData() {
     if (GPS_enabled == 1) {
         navigator.geolocation.getCurrentPosition(function(position) {
-            GPS_data.latitude = position.coords.latitude;
-            GPS_data.longitude = position.coords.longitude;
-            GPS_data.altitude = position.coords.altitude;
+            GPS_data.latitude = checkNull(position.coords.latitude);
+            GPS_data.longitude = checkNull(position.coords.longitude);
+            GPS_data.altitude = checkNull(position.coords.altitude);
         });
     } else {
         // Clear the GPS data if it's disabled

@@ -53,6 +53,13 @@ def receive_post_data():
     if request.method == 'POST':
         current_time = timestamp()
         client_data = json.loads(request.form['data'])
+
+        #  Sanitize numerical data, so any "None" or Null values become 0's
+        for key in ["TiltFB","TiltLR","Direction","altitude","latitude","longitude"]:
+            if client_data[key] == None:
+                print "Sanitized: %s on %s" % (key, client_data['devid'])
+                client_data[key] = 0
+
         client_data['timestamp'] = current_time
 
         # Key is devid:<UUID>, expires in 3 seconds

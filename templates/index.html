@@ -182,6 +182,10 @@
           os = "iOS";
       } else if (ua.match(/Android/i)) {
           os = "Android";
+      } else if (ua.match(/Windows/i)) {
+          os = "Windows";   
+      } else if ((ua.match(/Blackberry/i)) || (ua.match(/BB/i)) || (ua.match(/RIM/))) {
+          os = "Blackberry";
       } else {
           os = "Unknown";
       }

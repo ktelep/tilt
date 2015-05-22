@@ -36,7 +36,33 @@
          <a style="padding-top:10px" data-toggle="collapse" data-target="#server_info">Tilt Data Output</a></h2>
         <!--<div class="panel panel-default" id="panel1"> --> 
             <div id="server_info" class="collapse" style="margin:10px;">
-                <p>CloudFoundry Instances</p>
+                <p>CloudFoundry Instances 
+                <div class="dropdown">
+                     <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1"
+                         data-toggle="dropdown" aria-expanded=true">
+                         Number of Instances
+                         <span class="caret"></span>
+                     </button>
+                     <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                         <li role="presentation"><a role="menuitem" tabindex="-1" onclick="scale_app(1);return
+                             false;"href="#">1</a></li>
+                         <li role="presentation"><a role="menuitem" tabindex="-1" onclick="scale_app(2);return
+                             false;"href="#">2</a></li>
+                         <li role="presentation"><a role="menuitem" tabindex="-1" onclick="scale_app(3);return
+                             false;"href="#">3</a></li>
+                         <li role="presentation"><a role="menuitem" tabindex="-1" onclick="scale_app(4);return
+                             false;"href="#">4</a></li>
+                         <li role="presentation"><a role="menuitem" tabindex="-1" onclick="scale_app(5);return
+                             false;"href="#">5</a></li>
+                         <li role="presentation"><a role="menuitem" tabindex="-1" onclick="scale_app(6);return
+                             false;"href="#">6</a></li>
+                         <li role="presentation"><a role="menuitem" tabindex="-1" onclick="scale_app(7);return
+                             false;"href="#">7</a></li>
+                         <li role="presentation"><a role="menuitem" tabindex="-1" onclick="scale_app(8);return
+                             false;"href="#">8</a></li>
+                     </ul>
+                 </div>
+                </p>
             </div>
         <!-- </div>-->
       
@@ -102,6 +128,13 @@
 
         // Remove from our list of panels
         panels.splice($.inArray(dev_id,panels), 1);
+    }
+
+    function scale_app(new_instances){
+        $.ajax({
+              type: "POST",
+              url: "/scale",
+              data: { instances: new_instances }});
     }
 
     function load_data() {

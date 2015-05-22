@@ -1,12 +1,24 @@
-from flask import Flask, request, render_template, jsonify
+from flask import Flask, request, render_template, jsonify, redirect
 import os
 import sys
 import time
 import json
 import redis
+from CloudFoundryClient import CloudFoundryClient
 
 app = Flask(__name__, static_url_path='/static')
 port = os.getenv('VCAP_APP_PORT', '5000')
+
+app_name = None
+cf_user = None
+cf_pass = None
+
+if os.getenv('VCAP_APPLICATION'):
+    app_name = json.loads(os.environ['VCAP_APPLICATION'])['application_name']
+
+if os.getenv('customconfig'):
+    cf_user = json.loads(os.environ['customconfig'])['cfuser']
+    cf_pass = json.loads(os.environ['customconfig'])['cfpass']
 
 if os.getenv('VCAP_SERVICES'):  # Connect to our Redis service in cloudfoundry
     try:
@@ -15,6 +27,7 @@ if os.getenv('VCAP_SERVICES'):  # Connect to our Redis service in cloudfoundry
     except KeyError:
         # IBM Bluemix
         redis_service = json.loads(os.environ['VCAP_SERVICES'])['redis-2.6'][0]
+
     credentials = redis_service['credentials']
     pool = redis.ConnectionPool(host=credentials['hostname'],
                                 port=credentials['port'],
@@ -93,6 +106,26 @@ def safe_dump():
         instances.append(inst)
     return jsonify(timestamp=max_score, data=data, min_score=min_score,
                    instance=instances)
+
+
+@app.route('/scale', methods=['POST'])
+def scale_app():
+    new_instances = int(request.form['instances'])
+    if ((new_instances > 8) or (new_instances < 1)):
+        return "fail"
+    else:
+        if cf_user:
+            client = CloudFoundryClient(cf_user,cf_pass)
+            client.authenticate()
+            app_data = client.get_app(app_name)
+            client.scale_app(app_data['url'], new_instances)
+
+    return "success"
+
+
+@app.route('/view')
+def view_redirect():
+    return redirect('http://tilt-view.cfapps.io')
 
 if __name__ == '__main__':
     app.debug = True

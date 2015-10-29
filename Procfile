@@ -1,1 +1,1 @@
-web: gunicorn -b 0.0.0.0:$VCAP_APP_PORT tilt_server:app
+web: gunicorn -b 0.0.0.0:$PORT tilt_server:app

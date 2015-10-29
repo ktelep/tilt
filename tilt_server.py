@@ -7,7 +7,17 @@ import redis
 from CloudFoundryClient import CloudFoundryClient
 
 app = Flask(__name__, static_url_path='/static')
-port = os.getenv('VCAP_APP_PORT', '5000')
+
+# Determine our running port.  Updated to support Diego which uses the
+# 'PORT' environment variable, vs non-Diego which uses VCAP_APP_PORT
+
+if os.getenv('VCAP_APP_PORT'):
+    port = os.getenv('VCAP_APP_PORT')
+elif os.getenv('PORT'):
+    port = os.getenv('PORT')
+else:
+    port = "8080"
+
 
 app_name = None
 cf_user = None

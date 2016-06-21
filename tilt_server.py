@@ -124,7 +124,8 @@ def receive_post_data():
         client_data = json.loads(request.form['data'])
 
         #  Sanitize numerical data, so any "None" or Null values become 0's
-        for key in ["TiltFB", "TiltLR", "Direction", "altitude", "latitude", "longitude"]:
+        for key in ["TiltFB", "TiltLR", "Direction", "altitude",
+                    "latitude", "longitude"]:
             if client_data[key] is None:
                 print "Sanitized: %s on %s" % (key, client_data['devid'])
                 client_data[key] = 0

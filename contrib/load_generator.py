@@ -9,7 +9,6 @@ import json
 from time import sleep
 from random import random, choice, randrange
 
-url = ""
 
 fake_gps_data = [[42.40, -73.45],   # Albany, NY
                  [35.05, -106.39],  # Albaquerque, NM
@@ -29,12 +28,13 @@ def guid():
     return s4()+"-"+s4()+"-Sim"
 
 
-def worker():
+def worker(url):
     my_id = guid()
     lat, lon = fake_gps_data[randrange(0, len(fake_gps_data))]
     while True:
         # Create a fake payload with random data
         print lat, lon
+        print url
         payload = dict(devid=my_id, TiltLR=random(), TiltFB=random(),
                        Direction=random(), altitude=0, latitude=lat,
                        longitude=lon, OS="LoadTest")
@@ -50,10 +50,11 @@ def display_usage():
           % sys.argv[0])
     sys.exit(0)
 
+
 if __name__ == '__main__':
 
     num_workers = 0
-
+    url = ""
     try:
         myopts, args = getopt.getopt(sys.argv[1:], "t:n:")
     except:
@@ -63,6 +64,7 @@ if __name__ == '__main__':
         display_usage()
 
     for o, a in myopts:
+        print o
         if o == '-t':
             if '/send' not in url:
                 url = a + '/send'
@@ -74,9 +76,8 @@ if __name__ == '__main__':
             num_workers = int(a)
         else:
             display_usage()
-
         jobs = []
         for i in range(num_workers):
-            p = multiprocessing.Process(target=worker)
+            p = multiprocessing.Process(target=worker, args=(url,))
             jobs.append(p)
             p.start()

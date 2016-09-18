@@ -39,15 +39,29 @@ if os.getenv('VCAP_SERVICES'):  # Connect to our Redis service in cloudfoundry
         # Pivotal CF
         redis_service = json.loads(os.environ['VCAP_SERVICES'])['rediscloud'][0]
     except KeyError:
-        # IBM Bluemix
-        redis_service = json.loads(os.environ['VCAP_SERVICES'])['redis-2.6'][0]
-
+		try:
+			# IBM Bluemix
+			redis_service = json.loads(os.environ['VCAP_SERVICES'])['redis-2.6'][0]
+		except KeyError:
+			try:
+				# PCFDEV
+				redis_service=json.loads(os.environ['VCAP_SERVICES'])['p-redis'][0]
+			except KeyError:
+				raise KeyError("Unable to identify Redis Environment")
+		
     credentials = redis_service['credentials']
-    pool = redis.ConnectionPool(host=credentials['hostname'],
-                                port=credentials['port'],
-                                password=credentials['password'],
-                                max_connections=2)
-
+    try: 
+		# Pivotal CF and Bluemix
+		pool = redis.ConnectionPool(host=credentials['hostname'],
+									port=credentials['port'],
+									password=credentials['password'],
+									max_connections=2)
+    except KeyError:
+		pool = redis.ConnectionPool(host=credentials['host'],
+									port=credentials['port'],
+									password=credentials['password'],
+									max_connections=2)
+									
     r = redis.Redis(connection_pool=pool)
 else:   # Local redis server as a failback
     r = redis.Redis()

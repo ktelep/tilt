@@ -49,10 +49,10 @@ def getServiceInfo():
         # Service Key Name
         service = value[1]['service']
 
-        try:
+        if service in json.loads(os.environ['VCAP_SERVICES']):
             redis_service = json.loads(os.environ['VCAP_SERVICES'])[service][0]
             break
-        except KeyError:
+        else:
             continue
 
     if redis_service:
@@ -62,21 +62,20 @@ def getServiceInfo():
 
 
 def getHostKey():
-    hostName = None
+    hostKey = None
     for value in redis_keys.iteritems():
         # Host Key Name
         host = value[1]['host']
-        try:
-            hostName = credentials[host]
+        if host in credentials:
+            hostKey = host
             break
-        except KeyError:
+        else:
             continue
 
-    if hostName:
-        return host
+    if hostKey:
+        return hostKey
     else:
         raise KeyError("Unable to identify Redis Host")
-    
 
 app_name = None
 cf_user = None
@@ -101,7 +100,7 @@ if os.getenv('VCAP_SERVICES'):
                                 port=credentials['port'],
                                 password=credentials['password'],
                                 max_connections=2)
-	
+
     r = redis.Redis(connection_pool=pool)
 else:   # Local redis server as a failback
     r = redis.Redis()

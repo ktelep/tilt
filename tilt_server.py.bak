@@ -49,10 +49,10 @@ def getServiceInfo():
         # Service Key Name
         service = value[1]['service']
 
-        if service in json.loads(os.environ['VCAP_SERVICES']):
+        try:
             redis_service = json.loads(os.environ['VCAP_SERVICES'])[service][0]
             break
-        else:
+        except KeyError:
             continue
 
     if redis_service:

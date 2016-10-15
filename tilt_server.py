@@ -21,6 +21,61 @@ elif os.getenv('PORT'):
 else:
     port = "8080"
 
+redis_keys = {
+                'pivotalcf': {
+                                'service': 'rediscloud',
+                                'host': 'hostname',
+                                'port': 'port',
+                                'password': 'password'
+                            },
+                'pcfdev': {
+                                'service': 'p-redis',
+                                'host': 'host',
+                                'port': 'port',
+                                'password': 'password'
+                            },
+                'bluemix': {
+                                'service': 'redis-2.6',
+                                'host': 'hostname',
+                                'port': 'port',
+                                'password': 'password'
+                            }
+            }
+
+
+def getServiceInfo():
+    redis_service = None
+    for value in redis_keys.iteritems():
+        # Service Key Name
+        service = value[1]['service']
+
+        if service in json.loads(os.environ['VCAP_SERVICES']):
+            redis_service = json.loads(os.environ['VCAP_SERVICES'])[service][0]
+            break
+        else:
+            continue
+
+    if redis_service:
+        return redis_service
+    else:
+        raise KeyError("Unable to identify Redis Environment")
+
+
+def getHostKey():
+    hostKey = None
+    for value in redis_keys.iteritems():
+        # Host Key Name
+        host = value[1]['host']
+        if host in credentials:
+            hostKey = host
+            break
+        else:
+            continue
+
+    if hostKey:
+        return hostKey
+    else:
+        raise KeyError("Unable to identify Redis Host")
 
 app_name = None
 cf_user = None
@@ -34,16 +89,14 @@ if os.getenv('customconfig'):
     cf_user = json.loads(os.environ['customconfig'])['cfuser']
     cf_pass = json.loads(os.environ['customconfig'])['cfpass']
 
-if os.getenv('VCAP_SERVICES'):  # Connect to our Redis service in cloudfoundry
-    try:
-        # Pivotal CF
-        redis_service = json.loads(os.environ['VCAP_SERVICES'])['rediscloud'][0]
-    except KeyError:
-        # IBM Bluemix
-        redis_service = json.loads(os.environ['VCAP_SERVICES'])['redis-2.6'][0]
+# Connect to our Redis service in cloudfoundry
+if os.getenv('VCAP_SERVICES'):
+    redis_service = getServiceInfo()
 
     credentials = redis_service['credentials']
-    pool = redis.ConnectionPool(host=credentials['hostname'],
+    hostKey = getHostKey()
+    print credentials[hostKey]
+    pool = redis.ConnectionPool(host=credentials[hostKey],
                                 port=credentials['port'],
                                 password=credentials['password'],
                                 max_connections=2)
@@ -55,6 +108,7 @@ else:   # Local redis server as a failback
 try:
     # Test our connection
     response = r.client_list()
+
     r.set("server:" + port, 0)
     r.expire("server:" + port, 3)
 
@@ -191,6 +245,7 @@ def scale_app():
 @app.route('/view')
 def view_redirect():
     return redirect('http://tilt-view.cfapps.io')
+
 
 if __name__ == '__main__':
     app.debug = True

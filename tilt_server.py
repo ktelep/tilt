@@ -80,7 +80,7 @@ def getHostKey():
 app_name = None
 cf_user = None
 cf_pass = None
-visualization = 'http://tiltvis.cfapps.io'
+visualization = 'http://tilt-view.cfapps.io'
 
 if os.getenv('VCAP_APPLICATION'):
     app_name = json.loads(os.environ['VCAP_APPLICATION'])['application_name']
@@ -244,7 +244,7 @@ def scale_app():
 
 @app.route('/view')
 def view_redirect():
-    return redirect('http://tilt-view.cfapps.io')
+    return redirect(visualization)
 
 
 if __name__ == '__main__':

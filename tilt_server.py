@@ -1,5 +1,7 @@
 from flask import Flask, request, render_template, jsonify, redirect
 from flask import make_response, request, current_app
+from flask_sslify import SSLify
+
 import os
 import sys
 import time
@@ -10,6 +12,7 @@ from CloudFoundryClient import CloudFoundryClient
 from functools import update_wrapper
 
 app = Flask(__name__, static_url_path='/static')
+sslify = SSLify(app)
 
 # Determine our running port.  Updated to support Diego which uses the
 # 'PORT' environment variable, vs non-Diego which uses VCAP_APP_PORT
@@ -20,6 +23,12 @@ elif os.getenv('PORT'):
     port = os.getenv('PORT')
 else:
     port = "8080"
+
+
+if os.getenv('CF_INSTANCE_INDEX'):
+    inst_index = os.getenv('CF_INSTANCE_INDEX')
+else:
+    inst_index = "UNK"
 
 redis_keys = {
                 'pivotalcf': {
@@ -109,8 +118,8 @@ try:
     # Test our connection
     response = r.client_list()
 
-    r.set("server:" + port, 0)
-    r.expire("server:" + port, 3)
+    r.set("server:" + inst_index, 0)
+    r.expire("server:" + inst_index, 3)
 
 except redis.ConnectionError:
     print "Unable to connect to a Redis server, check environment"
@@ -192,8 +201,8 @@ def receive_post_data():
         r.expire('devid:' + client_data['devid'], 3)
 
         # Update # of connections processed
-        r.incr('server:' + port)
-        r.expire('server:' + port, 3)
+        r.incr('server:' + inst_index)
+        r.expire('server:' + inst_index, 3)
         return "success"
     return "fail"
 

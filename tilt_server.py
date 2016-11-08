@@ -1,5 +1,5 @@
 from flask import Flask, request, render_template, jsonify, redirect
-from flask import make_response, request, current_app
+from flask import make_response, current_app
 from flask_sslify import SSLify
 
 import os

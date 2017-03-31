@@ -2,9 +2,9 @@
 # Manifest for tilt demo application
 # Kurt Telep
 applications:
-- name: tilt
+- name: tilt_emcw2017
   scale: 2
   memory: 256MB
   buildpack: python_buildpack
   services:
-  - TILT_REDIS
+  - TILT_REDIS_DEV

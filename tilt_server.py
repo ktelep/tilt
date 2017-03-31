@@ -186,29 +186,48 @@ def receive_post_data():
         current_time = timestamp()
         client_data = json.loads(request.form['data'])
 
+        accel_fields = ["TiltFB", "TiltLR", "Direction"]
+        gps_fields = ["altitude", "latitude", "longitude"]
+
+        data_fields = accel_fields + gps_fields
+
         #  Sanitize numerical data, so any "None" or Null values become 0's
-        for key in ["TiltFB", "TiltLR", "Direction", "altitude",
-                    "latitude", "longitude"]:
+        for key in data_fields:
             if client_data[key] is None:
                 print "Sanitized: %s on %s" % (key, client_data['devid'])
                 client_data[key] = 0
 
         client_data['timestamp'] = current_time
 
-        # Key is devid:<UUID>, expires in 3 seconds
+        # Key is devid:<UUID>, expires in 3 seconds, this is for live
+        # visualization
         r.zadd('devid:' + client_data['devid'],
                json.dumps(client_data), current_time)
         r.expire('devid:' + client_data['devid'], 3)
 
-        # Add key to list of devids and score by timestamp it appeared
-        r.zadd('devidlist',client_data['devid'],current_time)
-       
-        # Store each individual datapoint over time
+        # There's value in keeping the data for longer periods of time
+        # however may want to consider a way to expire some of it....
+
+        # Add key to list of devids and score by last timestamp seen
+        r.zadd('devidlist', client_data['devid'], current_time)
+
+        # Store data for historical history (currently non-expiring)
+        # key here is devidhistory:<devid>:data_field
+        for key in accel_fields:
+            r.zadd('devidhistory:'+client_data['devid']+':'+key,
+                   client_data[key], current_time)
+
+        # GPS data is stored as just a key->value as the probability of
+        # changes in GPS location is small for a devid.
+        for key in gps_fields:
+            r.set('devidhistory:'+client_data['devid']+':'+key,
+                  client_data[key])
 
         # Update # of connections processed
         r.incr('server:' + inst_index)
         r.expire('server:' + inst_index, 3)
         return "success"
+
     return "fail"
 
 

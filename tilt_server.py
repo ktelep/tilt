@@ -200,6 +200,11 @@ def receive_post_data():
                json.dumps(client_data), current_time)
         r.expire('devid:' + client_data['devid'], 3)
 
+        # Add key to list of devids and score by timestamp it appeared
+        r.zadd('devidlist',client_data['devid'],current_time)
+       
+        # Store each individual datapoint over time
+
         # Update # of connections processed
         r.incr('server:' + inst_index)
         r.expire('server:' + inst_index, 3)

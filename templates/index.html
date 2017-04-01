@@ -214,9 +214,10 @@
     }
 
 function postSuccess(result) {
-    //document.getElementById("alertmessage").text(result)
-    console.log(result)
+    if (result.message) { 
+        $('#alertmessage').text(result.message)
     }
+}
 
 
 function deviceOrientationHandler(tiltLR, tiltFB, dir, dev_id, os) {

@@ -234,13 +234,13 @@ function deviceOrientationHandler(tiltLR, tiltFB, dir, dev_id, os) {
     }
 
     data = {devid: dev_id, 
-        TiltLR: checkNull(tiltLR), 
-        TiltFB: checkNull(tiltFB), 
-        Direction: checkNull(dir), 
+        TiltLR: checkNull(tiltLR).toFixed(2), 
+        TiltFB: checkNull(tiltFB).toFixed(2), 
+        Direction: checkNull(dir).toFixed(2), 
         OS: os,
-        latitude: GPS_data.latitude,
-        longitude: GPS_data.longitude,
-        altitude: GPS_data.altitude
+        latitude: GPS_data.latitude.toFixed(2),
+        longitude: GPS_data.longitude.toFixed(2),
+        altitude: GPS_data.altitude.toFixed(2)
     };
 
     // Apply the transform to the image

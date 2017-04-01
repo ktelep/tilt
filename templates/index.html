@@ -102,6 +102,9 @@
            <div class="col-xs-3 col-md-3 text-center">
                <img src="{{ url_for('static', filename='Pathfinder-Logo.png') }}" id="pfLogo" class="pflogo">
            </div>
+           <div class="col-xs-3 col-md-3 text-center vcenter" id="alertmessage">
+               
+           </div>    
       </div>
   </div>
   </div>
@@ -209,7 +212,13 @@
         document.getElementById("doEvent").innerHTML = "Not supported on your device or browser.  Sorry."
       }
     }
-  
+
+function postSuccess(result) {
+    //document.getElementById("alertmessage").text(result)
+    console.log(result)
+    }
+
+
 function deviceOrientationHandler(tiltLR, tiltFB, dir, dev_id, os) {
     var data;
 
@@ -244,7 +253,8 @@ function deviceOrientationHandler(tiltLR, tiltFB, dir, dev_id, os) {
         $.ajax({
         type: "POST",
         url: url,
-        data: { data: JSON.stringify(data) }
+        data: { data: JSON.stringify(data) },
+        success: postSuccess
         }); 
         update_count = 0;
     }

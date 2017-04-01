@@ -226,9 +226,12 @@ def receive_post_data():
         # Update # of connections processed
         r.incr('server:' + inst_index)
         r.expire('server:' + inst_index, 3)
-        return "success"
 
-    return "fail"
+        mess = r.get("message:"+client_data['devid'])
+
+        return jsonify(status="success", message=mess)
+
+    return jsonify(status="fail")
 
 
 @app.route('/show')

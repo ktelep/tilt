@@ -1,0 +1,12 @@
+---
+# Manifest for tilt demo application
+# Kurt Telep
+applications:
+- name: tilt_emcw2017
+  scale: 2
+  memory: 256MB
+  buildpack: python_buildpack
+  env:
+    visualization_url: "*"
+  services:
+  - TILT_PCFDEV

@@ -90,7 +90,8 @@ def getHostKey():
 app_name = None
 cf_user = None
 cf_pass = None
-visualization = 'http://tilt-view.cfapps.io'
+
+visualization = '*'
 
 if os.getenv('VCAP_APPLICATION'):
     app_name = json.loads(os.environ['VCAP_APPLICATION'])['application_name']
@@ -98,6 +99,11 @@ if os.getenv('VCAP_APPLICATION'):
 if os.getenv('customconfig'):
     cf_user = json.loads(os.environ['customconfig'])['cfuser']
     cf_pass = json.loads(os.environ['customconfig'])['cfpass']
+
+if os.getenv('visualization_url'):
+    visualization = os.environ['visualization_url']
+else:
+    visualization = '*'
 
 # Connect to our Redis service in cloudfoundry
 if os.getenv('VCAP_SERVICES'):

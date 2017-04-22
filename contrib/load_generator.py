@@ -38,7 +38,7 @@ def worker(url):
         payload = dict(devid=my_id, TiltLR=random(), TiltFB=random(),
                        Direction=random(), altitude=0, latitude=lat,
                        longitude=lon, OS="LoadTest")
-        r = requests.post(url, dict(data=json.dumps(payload)))
+        r = requests.post(url, dict(data=json.dumps(payload)), verify=False)
         if r.status_code != 200:
             print "failed with %s" % str(r.status_code)
         print r.elapsed

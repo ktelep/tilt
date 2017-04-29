@@ -42,7 +42,7 @@ def worker(url):
         if r.status_code != 200:
             print "failed with %s" % str(r.status_code)
         print r.elapsed
-        sleep(0.05)
+        sleep(0.1)
 
 
 def display_usage():

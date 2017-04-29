@@ -192,11 +192,12 @@ def receive_post_data():
     if request.method == 'POST':
         current_time = timestamp()
         client_data = json.loads(request.form['data'])
-
+        print client_data.keys()
         accel_fields = ["TiltFB", "TiltLR", "Direction"]
         gps_fields = ["altitude", "latitude", "longitude"]
+        info_fields = ["OS", "industry"]
 
-        data_fields = accel_fields + gps_fields
+        data_fields = accel_fields + gps_fields + info_fields
 
         #  Sanitize numerical data, so any "None" or Null values become 0's
         for key in data_fields:
@@ -229,11 +230,15 @@ def receive_post_data():
                 pipe.zadd('devidhistory:'+client_data['devid']+':'+key+':Values',
                           float(client_data[key]), current_time)
 
-            # GPS data is stored as just a key->value as the probability of
+            # Other data is stored as just a key->value as the probability of
             # changes in GPS location is small for a devid.
             for key in gps_fields:
                 pipe.set('devidhistory:'+client_data['devid']+':'+key+':Values',
                          float(client_data[key]))
+ 
+            for key in info_fields:
+                pipe.set('devidhistory:'+client_data['devid']+':'+key+':Values',
+                         client_data[key])
 
             # Update # of connections processed
             pipe.incr('server:' + inst_index)

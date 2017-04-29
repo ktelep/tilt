@@ -74,6 +74,37 @@
                           <button id="GPSdisable" type="button" class="btn btn-danger" onclick="toggleGPS()">Disabled</button>
                       </div>
                   </div>
+                  <div class="form-group">
+                      <label for="industry">Industry: </label>
+                      <select class="form-control" id="industry">
+                          <option value="">-- Please Select --</option>
+                          <option value="Agriculture">Agriculture</option>
+                          <option value="Broadcasting">Broadcasting</option>
+                          <option value="Computer and Electronics Manufacturer">Computer and Electronics Manufacturer</option>
+                          <option value="Construction">Construction</option>
+                          <option value="Education K12">Education K12</option>
+                          <option value="Education Higher-Ed">Education Higher-Ed</option>
+                          <option value="Finance">Finance</option>
+                          <option value="Government">Government</option>
+                          <option value="Healthcare">Healthcare</option>
+                          <option value="Hotel and Food Services">Hotel and Food Services</option>
+                          <option value="Info Service and Data Processing">Info Service and Data Proceessing</option>
+                          <option value="Legal Services">Legal Services</option>
+                          <option value="Military">Military</option>
+                          <option value="Mining">Mining</option>
+                          <option value="Publishing">Publishing</option>
+                          <option value="Real Estate">Real Estate</option>
+                          <option value="Religious">Religious</option>
+                          <option value="Retail">Retail</option>
+                          <option value="Scientific">Scientific or Technical Services</option>
+                          <option value="Software">Software</option>
+                          <option value="Telecommunications">Telecommunications</option>
+                          <option value="Transport and Warehousing">Transport and Warehousing</option>
+                          <option value="Utilities">Utilities</option>
+                          <option value="Wholesale">Wholesale</option>
+                          <option value="Other">Other</option>
+                      </select>
+                  </div>
           </div>
           <div class="row row-centered">
                   <div class="col-centered text-center col-xs-3 col-md-3">
@@ -165,6 +196,7 @@
 
             // Update our values
             $("#devid_val").text(sanitized_ID);
+            $("#device_id_alias").attr("placeholder", "").val(sanitized_ID);
             console.log("Unsanitized ID:",newID,"Sanitized ID:",sanitized_ID)
             dev_id = sanitized_ID;
         } else {
@@ -178,6 +210,7 @@
  
       dev_id = guid()
       $("#devid_val").text(dev_id)
+      $("#device_id_alias").attr("placeholder", "").val(dev_id);
 
       var os = "";
       var ua = navigator.userAgent;
@@ -204,9 +237,11 @@
           
           // alpha is the compass direction the device is facing in degrees
           var dir = eventData.alpha
+
+          var industry = $("#industry").val()
           
           // call our orientation event handler
-          deviceOrientationHandler(tiltLR, tiltFB, dir, dev_id, os);
+          deviceOrientationHandler(tiltLR, tiltFB, dir, dev_id, os, industry);
           }, false);
       } else {
         document.getElementById("doEvent").innerHTML = "Not supported on your device or browser.  Sorry."
@@ -220,7 +255,7 @@ function postSuccess(result) {
 }
 
 
-function deviceOrientationHandler(tiltLR, tiltFB, dir, dev_id, os) {
+function deviceOrientationHandler(tiltLR, tiltFB, dir, dev_id, os, industry) {
     var data;
 
     document.getElementById("TiltLR").value = Math.round(tiltLR);
@@ -240,7 +275,8 @@ function deviceOrientationHandler(tiltLR, tiltFB, dir, dev_id, os) {
         OS: os,
         latitude: GPS_data.latitude.toFixed(2),
         longitude: GPS_data.longitude.toFixed(2),
-        altitude: GPS_data.altitude.toFixed(2)
+        altitude: GPS_data.altitude.toFixed(2),
+        industry: industry
     };
 
     // Apply the transform to the image

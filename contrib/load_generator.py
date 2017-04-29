@@ -35,7 +35,8 @@ def worker(url):
         # Create a fake payload with random data
         print lat, lon
         print url
-        payload = dict(devid=my_id, TiltLR=random(), TiltFB=random(),
+        payload = dict(devid=my_id, TiltLR=randrange(-90,90),
+                       TiltFB=randrange(-180,180),
                        Direction=random(), altitude=0, latitude=lat,
                        longitude=lon, OS="LoadTest", industry="Publishing")
         r = requests.post(url, dict(data=json.dumps(payload)), verify=False)

@@ -192,6 +192,7 @@ def receive_post_data():
     if request.method == 'POST':
         current_time = timestamp()
         client_data = json.loads(request.form['data'])
+        data_length = request.headers["Content-Length"]
         print client_data.keys()
         accel_fields = ["TiltFB", "TiltLR", "Direction"]
         gps_fields = ["altitude", "latitude", "longitude"]
@@ -223,6 +224,10 @@ def receive_post_data():
 
             # Add key to list of devids and score by last timestamp seen
             pipe.zadd('devidlist', client_data['devid'], current_time)
+
+            # Store bandwidth sizes
+            pipe.zadd('devidhistory:'+client_data['devid']+':ReqSize:Values',
+                      float(data_length), current_time)
 
             # Store data for historical history (currently non-expiring)
             # key here is devidhistory:<devid>:data_field

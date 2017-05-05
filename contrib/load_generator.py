@@ -19,6 +19,23 @@ fake_gps_data = [[42.40, -73.45],   # Albany, NY
                  [45.5, -73.5],     # Montreal
                  ]
 
+verticals = ["Automotive",
+             "Banking",
+             "Education",
+             "Engineering",
+             "Energy",
+             "Financial",
+             "Food and Beverage",
+             "Government",
+             "Healthcare",
+             "Insurance",
+             "Manufacturing",
+             "Media",
+             "Retail",
+             "Technology",
+             "Telecommunications",
+             "Transportation"]
+
 
 def s4(size=4, chars=string.ascii_lowercase + string.digits):
     return ''.join(choice(chars) for _ in range(size))
@@ -31,6 +48,7 @@ def guid():
 def worker(url):
     my_id = guid()
     lat, lon = fake_gps_data[randrange(0, len(fake_gps_data))]
+    ind = choice(verticals)
     while True:
         # Create a fake payload with random data
         print lat, lon
@@ -38,7 +56,7 @@ def worker(url):
         payload = dict(devid=my_id, TiltLR=randrange(-90,90),
                        TiltFB=randrange(-180,180),
                        Direction=random(), altitude=0, latitude=lat,
-                       longitude=lon, OS="LoadTest", industry="Publishing")
+                       longitude=lon, OS="LoadTest", industry=ind)
         r = requests.post(url, dict(data=json.dumps(payload)), verify=False)
         if r.status_code != 200:
             print "failed with %s" % str(r.status_code)

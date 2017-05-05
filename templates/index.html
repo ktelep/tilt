@@ -269,13 +269,13 @@ function deviceOrientationHandler(tiltLR, tiltFB, dir, dev_id, os, industry) {
     }
 
     data = {devid: dev_id, 
-        TiltLR: checkNull(tiltLR).toFixed(2), 
-        TiltFB: checkNull(tiltFB).toFixed(2), 
-        Direction: checkNull(dir).toFixed(2), 
+        TiltLR: checkNull(tiltLR).toFixed(4), 
+        TiltFB: checkNull(tiltFB).toFixed(4), 
+        Direction: checkNull(dir).toFixed(4), 
         OS: os,
-        latitude: GPS_data.latitude.toFixed(2),
-        longitude: GPS_data.longitude.toFixed(2),
-        altitude: GPS_data.altitude.toFixed(2),
+        latitude: GPS_data.latitude.toFixed(4),
+        longitude: GPS_data.longitude.toFixed(4),
+        altitude: GPS_data.altitude.toFixed(4),
         industry: industry
     };
 

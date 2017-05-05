@@ -211,7 +211,7 @@ def receive_post_data():
         # We're going to use redis pipeline to speed up our transactions
         # to the server, redis is running in the cloud, so we just run all
         # of these commands atomically as a single transaction
-        with r.pipeline() as pipe:
+        with r.pipeline(transaction=False) as pipe:
 
             # Key is devid:<UUID>, expires in 3 seconds, this is for live
             # visualization
@@ -226,8 +226,10 @@ def receive_post_data():
             pipe.zadd('devidlist', client_data['devid'], current_time)
 
             # Store bandwidth sizes
-            pipe.zadd('devidhistory:'+client_data['devid']+':ReqSize:Values',
-                      float(data_length), current_time)
+            print int(data_length)
+            pipe.incrby('devidhistory:'+client_data['devid']+':TotalBW',
+                      amount=int(data_length))
+
 
             # Store data for historical history (currently non-expiring)
             # key here is devidhistory:<devid>:data_field
@@ -249,7 +251,8 @@ def receive_post_data():
             pipe.incr('server:' + inst_index)
             pipe.expire('server:' + inst_index, 3)
 
-            pipe.execute()
+            output = pipe.execute()
+            print output
 
         # Handle an outgoing message to the client
         mess = r.get("message:"+client_data['devid'])

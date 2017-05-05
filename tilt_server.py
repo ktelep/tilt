@@ -126,7 +126,7 @@ try:
     response = r.client_list()
 
     r.set("server:" + inst_index, 0)
-    r.expire("server:" + inst_index, 3)
+    r.expire("server:" + inst_index, 86400)
 
 except redis.ConnectionError:
     print "Unable to connect to a Redis server, check environment"
@@ -249,7 +249,7 @@ def receive_post_data():
 
             # Update # of connections processed
             pipe.incr('server:' + inst_index)
-            pipe.expire('server:' + inst_index, 3)
+            pipe.expire('server:' + inst_index, 86400)
 
             output = pipe.execute()
             print output

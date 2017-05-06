@@ -74,6 +74,28 @@
                           <button id="GPSdisable" type="button" class="btn btn-danger" onclick="toggleGPS()">Disabled</button>
                       </div>
                   </div>
+                  <div class="form-group">
+                      <label for="industry">Industry: </label>
+                      <select class="form-control" id="industry">
+                          <option value="">-- Please Select --</option>
+                          <option value="Automotive">Automotive</option>
+                          <option value="Banking">Banking</option>
+                          <option value="Education">Education</option>
+                          <option value="Energy">Energy</option>
+                          <option value="Financial">Financial</option>
+                          <option value="Food and Beverage">Food and Beverage</option>
+                          <option value="Government">Government</option>
+                          <option value="Healthcare">Healthcare</option>
+                          <option value="Insurance">Insurance</option>
+                          <option value="Manufacturing">Manufacturing</option>
+                          <option value="Media">Media</option>
+                          <option value="Retail">Retail</option>
+                          <option value="Technology">Technology</option>
+                          <option value="Telecommunications">Telecommunications</option>
+                          <option value="Transportation">Transportation</option>
+                          <option value="Other">Other</option>
+                      </select>
+                  </div>
           </div>
           <div class="row row-centered">
                   <div class="col-centered text-center col-xs-3 col-md-3">
@@ -102,6 +124,9 @@
            <div class="col-xs-3 col-md-3 text-center">
                <img src="{{ url_for('static', filename='Pathfinder-Logo.png') }}" id="pfLogo" class="pflogo">
            </div>
+           <div class="col-xs-3 col-md-3 text-center vcenter" id="alertmessage">
+               
+           </div>    
       </div>
   </div>
   </div>
@@ -162,6 +187,7 @@
 
             // Update our values
             $("#devid_val").text(sanitized_ID);
+            $("#device_id_alias").attr("placeholder", "").val(sanitized_ID);
             console.log("Unsanitized ID:",newID,"Sanitized ID:",sanitized_ID)
             dev_id = sanitized_ID;
         } else {
@@ -175,6 +201,7 @@
  
       dev_id = guid()
       $("#devid_val").text(dev_id)
+      $("#device_id_alias").attr("placeholder", "").val(dev_id);
 
       var os = "";
       var ua = navigator.userAgent;
@@ -201,16 +228,25 @@
           
           // alpha is the compass direction the device is facing in degrees
           var dir = eventData.alpha
+
+          var industry = $("#industry").val()
           
           // call our orientation event handler
-          deviceOrientationHandler(tiltLR, tiltFB, dir, dev_id, os);
+          deviceOrientationHandler(tiltLR, tiltFB, dir, dev_id, os, industry);
           }, false);
       } else {
         document.getElementById("doEvent").innerHTML = "Not supported on your device or browser.  Sorry."
       }
     }
-  
-function deviceOrientationHandler(tiltLR, tiltFB, dir, dev_id, os) {
+
+function postSuccess(result) {
+    if (result.message) { 
+        $('#alertmessage').text(result.message)
+    }
+}
+
+
+function deviceOrientationHandler(tiltLR, tiltFB, dir, dev_id, os, industry) {
     var data;
 
     document.getElementById("TiltLR").value = Math.round(tiltLR);
@@ -224,27 +260,29 @@ function deviceOrientationHandler(tiltLR, tiltFB, dir, dev_id, os) {
     }
 
     data = {devid: dev_id, 
-        TiltLR: checkNull(tiltLR), 
-        TiltFB: checkNull(tiltFB), 
-        Direction: checkNull(dir), 
+        TiltLR: checkNull(tiltLR).toFixed(4), 
+        TiltFB: checkNull(tiltFB).toFixed(4), 
+        Direction: checkNull(dir).toFixed(4), 
         OS: os,
-        latitude: GPS_data.latitude,
-        longitude: GPS_data.longitude,
-        altitude: GPS_data.altitude
+        latitude: GPS_data.latitude.toFixed(4),
+        longitude: GPS_data.longitude.toFixed(4),
+        altitude: GPS_data.altitude.toFixed(4),
+        industry: industry
     };
 
     // Apply the transform to the image
     var logo = document.getElementById("imgLogo");
-    logo.style.webkitTransform = "rotate("+ tiltLR +"deg) rotate3d(1,0,0, "+ (tiltFB*-1)+"deg)";
+    logo.style.webkitTransform = "rotate("+ tiltLR +"deg) rotate3d(1,0,0, "+ ((tiltFB-60)*-1)+"deg)";
     logo.style.MozTransform = "rotate("+ tiltLR +"deg)";
-    logo.style.transform = "rotate("+ tiltLR +"deg) rotate3d(1,0,0, "+ (tiltFB*-1)+"deg)";
+    logo.style.transform = "rotate("+ tiltLR +"deg) rotate3d(1,0,0, "+ ((tiltFB-60)*-1)+"deg)";
 
     update_count++;
     if (update_count == 5) {
         $.ajax({
         type: "POST",
         url: url,
-        data: { data: JSON.stringify(data) }
+        data: { data: JSON.stringify(data) },
+        success: postSuccess
         }); 
         update_count = 0;
     }
